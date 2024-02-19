@@ -1,22 +1,92 @@
-# Inititalisation ---------------------------------------------------------
-
+# Load library
 library(tidyverse)
-library(readxl)
-library(lubridate)
 
-infile <- "C:\\Users\\asrus\\OneDrive\\Desktop\\Airport temperatures.xlsx"
+# Define and map station and product codes and names
+station_codes = c('023000', '023034')
+station_names = c('City', 'Airport')
+product_codes = c('0010', '0011')
+product_names = c('Max', 'Min')
 
-rawdat <- infile %>% excel_sheets() %>%
-  set_names() %>%
-  map_dfr(read_excel, path=infile) %>%
-  pivot_longer(c('Airport_Min', 'Airport_Max', 'City_Min', 'City_Max'), names_to = "key", values_to = "Temp") %>%
+# Initialise data frame
+raw_data <-
+  tibble(
+    Date = seq(as.Date("1887-01-01"), today(), "days"),
+    Year = year(Date),
+    Month = as.numeric(month(Date)),
+    Day = as.numeric(day(Date))
+  ) |>
+  select(-Date)
+
+# Extract raw data
+for (station_code in station_codes) {
+  for (product_code in product_codes) {
+    # Get station and product names
+    station_name <-
+      station_names[station_codes == station_code]
+    product_name <-
+      product_names[product_codes == product_code]
+    
+    # Unzip compressed file
+    temp <- tempfile()
+    unzip(
+      zipfile = paste0(
+        'Data/IDCJAC',
+        product_code,
+        '_',
+        station_code,
+        '_1800.zip'
+      ),
+      exdir = temp
+    )
+    
+    # Read and format data file
+    this_raw_data <-
+      read_csv(
+        file.path(
+          temp,
+          paste0(
+            'IDCJAC',
+            product_code,
+            '_',
+            station_code,
+            '_1800_Data.csv'
+          )
+        ),
+        col_select = c(Year, Month, Day, starts_with(product_name)),
+        show_col_types = FALSE
+      ) |>
+      mutate(Month = as.numeric(Month),
+             Day = as.numeric(Day))
+    
+    # Rename measurement variable
+    variable_name <-
+      paste(station_name, product_name, sep = '_')
+    this_raw_data <- this_raw_data |>
+      rename({
+        {
+          variable_name
+        }
+      } := starts_with(product_name))
+    
+    # Merge data frames
+    raw_data <-
+      left_join(raw_data, this_raw_data, by = c('Year', 'Month', 'Day'))
+  }
+}
+
+# Remove any rows where all measurements are missing
+raw_data <- raw_data |>
+  filter(!if_all(-c(Year, Month, Day), is.na))
+
+# Convert from long to wide data frame
+raw_data <- raw_data |>
+  pivot_longer(-c(Year, Month, Day), names_to = "key", values_to = "Temp") %>%
   separate(key, c("Location", "Type"), sep = "_")
-
 
 # Read in the data, derive basic variables --------------------------------
 y1 <- 1997
-cyr <- 2023
-ySummer <- rawdat %>% filter(Year >= y1, (Month < 4 | Month > 10), Type == 'Max') %>% 
+cyr <- 2024
+ySummer <- raw_data %>% filter(Year >= y1, (Month < 4 | Month > 10), Type == 'Max') %>% 
   mutate(MonthSum = if_else(Month > 10, Month - 10, Month + 2),
          Summer = if_else(Month > 10, Year - y1 + 1, Year - y1),  # Deriving a variable to group Nov-Mar in the same summer
          SummerAgo = cyr - y1 - Summer,   # Want the most recent summer plotted at bottom
@@ -57,12 +127,12 @@ ggplot(ySumHot, aes(DaySum, SummerPl)) +
 
 # Plot Airport maximums and minimums ------------------------
 y1 <- 1997
-cyr <- 2023
+cyr <- 2024
 
 # Create text label for the years
 yearlab <- str_c(as.character(seq(cyr-1, y1)), rep('-', cyr-y1), str_sub(as.character(seq(cyr, y1+1)), -2, -1))
 
-ySummer <- rawdat %>% filter(Year >= y1, (Month < 4 | Month > 10), Location == 'Airport') %>% 
+ySummer <- raw_data %>% filter(Year >= y1, (Month < 4 | Month > 10), Location == 'Airport') %>% 
   mutate(MonthSum = if_else(Month > 10, Month - 10, Month + 2),
          Summer = if_else(Month > 10, Year - y1 + 1, Year - y1),
          SummerAgo = cyr - y1 - Summer) %>%
