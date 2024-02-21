@@ -83,13 +83,19 @@ plot_temp <- function(season = 'summer',
       month_breaks <- c(0, 30, 61, 92, 120, 151)
     month_labels <-
       c("November", "December", "January", "February", "March")
-    legend_labels <- c("30.1-35.0", "35.1-40.0", "Above 40.0")
+    legend_labels <-
+      c("30.1-35.0\u00B0C",
+        "35.1-40.0\u00B0C",
+        "Above 40.0\u00B0C")
   }
   if (season == 'winter') {
     colours <- c("black", "cornflowerblue", "lightblue")
     month_breaks <- c(0, 31, 61, 92, 123, 153)
     month_labels <- c("May", "June", "July", "August", "September")
-    legend_labels <- c("Below 0.1", "0.1-3.0", "3.1-5.0")
+    legend_labels <-
+      c("Below 0.1\u00B0C",
+        "0.1-3.0\u00B0C",
+        "3.1-5.0\u00B0C")
   }
   
   # Generate graph
@@ -144,67 +150,63 @@ plot_temp <- function(season = 'summer',
 plot_temp(start_year = 1993)
 plot_temp(season = 'winter', start_year = 1992)
 
-
-
-
-
-# Plot Airport maximums and minimums ------------------------
-y1 <- 1997
-cyr <- 2024
-
-# Create text label for the years
-yearlab <-
-  str_c(as.character(seq(cyr - 1, y1)),
-        rep('-', cyr - y1),
-        str_sub(as.character(seq(cyr, y1 + 1)),-2,-1))
-
-ySummer <-
-  raw_data %>% filter(Year >= y1, (Month < 4 |
-                                     Month > 10), Location == 'Airport') %>%
-  mutate(
-    MonthSum = if_else(Month > 10, Month - 10, Month + 2),
-    Summer = if_else(Month > 10, Year - y1 + 1, Year - y1),
-    SummerAgo = cyr - y1 - Summer
-  ) %>%
-  filter(Summer > 0)  # Remove Jan-Mar of y1
-ySummer <-
-  ySummer %>% group_by(Summer, Type) %>% mutate(DaySum = row_number()) %>% ungroup()
-
-extreme_days <-
-  filter(ySummer, Temp > 30 &
-           Type == 'Max' | Temp > 21 & Type == 'Min') %>%
-  mutate(Temp_category = cut(Temp, c(21, 25, 30, 35, 40, 48))) %>%
-  mutate(Summer_place = if_else(Type == 'Max', SummerAgo + 0.15, SummerAgo -
-                                  0.15))
-
-# Get counts of the number of days above 40, to display on the right
-countHot <-
-  filter(extreme_days, Type == 'Max') %>% group_by(Summer_place) %>% summarise(FortyPlus = sum(Type == 'Max' &
-                                                                                                 Temp > 40)) %>%
-  mutate(xv = 155)
-
-ggplot(extreme_days, aes(DaySum, Summer_place)) +
-  geom_point(aes(color = Temp_category), shape = 15) +
-  scale_colour_manual(
-    values = c("orchid2", "orchid4", "salmon", "red2", "black"),
-    name = "Temp",
-    labels = c("21.1-25.0", "25.1-30", "30.1-35.0", "35.1-40.0", "Above 40.0")
-  ) +
-  geom_vline(xintercept = c(0, 30, 61, 92, 120, 151) + 0.5) +
-  scale_y_continuous(breaks = seq(0, cyr - y1 - 1), labels = yearlab) +
-  scale_x_continuous(
-    breaks = c(15, 45, 76, 105, 134),
-    labels = c("Nov", "Dec", "Jan", "Feb", "Mar")
-  ) +
-  theme(
-    plot.title = element_text(hjust = 0.5),
-    plot.subtitle = element_text(hjust = 0.5),
-    plot.title.position = "plot",
-    axis.title.x = element_blank(),
-    axis.title.y = element_blank(),
-    legend.position = "bottom"
-  ) +
-  coord_cartesian(xlim = c(2, 155)) +
-  labs(title = "Adelaide Airport high maximum and minimum temperatures",
-       subtitle = "Within each year, top square is maximim and bottom square is minimum") +
-  geom_text(data = countHot,  aes(xv, Summer_place, label = FortyPlus))
+# # Plot Airport maximums and minimums ------------------------
+# y1 <- 1997
+# cyr <- 2024
+# 
+# # Create text label for the years
+# yearlab <-
+#   str_c(as.character(seq(cyr - 1, y1)),
+#         rep('-', cyr - y1),
+#         str_sub(as.character(seq(cyr, y1 + 1)),-2,-1))
+# 
+# ySummer <-
+#   raw_data %>% filter(Year >= y1, (Month < 4 |
+#                                      Month > 10), Location == 'Airport') %>%
+#   mutate(
+#     MonthSum = if_else(Month > 10, Month - 10, Month + 2),
+#     Summer = if_else(Month > 10, Year - y1 + 1, Year - y1),
+#     SummerAgo = cyr - y1 - Summer
+#   ) %>%
+#   filter(Summer > 0)  # Remove Jan-Mar of y1
+# ySummer <-
+#   ySummer %>% group_by(Summer, Type) %>% mutate(DaySum = row_number()) %>% ungroup()
+# 
+# extreme_days <-
+#   filter(ySummer, Temp > 30 &
+#            Type == 'Max' | Temp > 21 & Type == 'Min') %>%
+#   mutate(Temp_category = cut(Temp, c(21, 25, 30, 35, 40, 48))) %>%
+#   mutate(Summer_place = if_else(Type == 'Max', SummerAgo + 0.15, SummerAgo -
+#                                   0.15))
+# 
+# # Get counts of the number of days above 40, to display on the right
+# countHot <-
+#   filter(extreme_days, Type == 'Max') %>% group_by(Summer_place) %>% summarise(FortyPlus = sum(Type == 'Max' &
+#                                                                                                  Temp > 40)) %>%
+#   mutate(xv = 155)
+# 
+# ggplot(extreme_days, aes(DaySum, Summer_place)) +
+#   geom_point(aes(color = Temp_category), shape = 15) +
+#   scale_colour_manual(
+#     values = c("orchid2", "orchid4", "salmon", "red2", "black"),
+#     name = "Temp",
+#     labels = c("21.1-25.0", "25.1-30", "30.1-35.0", "35.1-40.0", "Above 40.0")
+#   ) +
+#   geom_vline(xintercept = c(0, 30, 61, 92, 120, 151) + 0.5) +
+#   scale_y_continuous(breaks = seq(0, cyr - y1 - 1), labels = yearlab) +
+#   scale_x_continuous(
+#     breaks = c(15, 45, 76, 105, 134),
+#     labels = c("Nov", "Dec", "Jan", "Feb", "Mar")
+#   ) +
+#   theme(
+#     plot.title = element_text(hjust = 0.5),
+#     plot.subtitle = element_text(hjust = 0.5),
+#     plot.title.position = "plot",
+#     axis.title.x = element_blank(),
+#     axis.title.y = element_blank(),
+#     legend.position = "bottom"
+#   ) +
+#   coord_cartesian(xlim = c(2, 155)) +
+#   labs(title = "Adelaide Airport high maximum and minimum temperatures",
+#        subtitle = "Within each year, top square is maximim and bottom square is minimum") +
+#   geom_text(data = countHot,  aes(xv, Summer_place, label = FortyPlus))

@@ -14,6 +14,8 @@ The data are from the [Australian Bureau of Meterology](http://www.bom.gov.au/?r
 * [Daily minimum temperature](http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023034)
 * The data extend as far back as 1955.
 
-![Graph of Airport daily maximum temperatures](airport-summer)
+## Graphs
 
-![Graph of Airport daily minimum temperatures](airport-winter)
+![Graph of Airport daily maximum temperatures](airport-summer.png)
+
+![Graph of Airport daily minimum temperatures](airport-winter.png)
