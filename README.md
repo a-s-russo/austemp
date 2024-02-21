@@ -7,7 +7,13 @@ The data are from the [Australian Bureau of Meterology](http://www.bom.gov.au/?r
 **Adelaide (West Terrace / Ngayirdapira)** (station number 23000):
 * [Daily maximum temperature](http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023000)
 * [Daily minimum temperature](http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023000)
+* Unfortunately, there are no data from 1980 to 2016.
 
 **Adelaide Airport** (station number 23034):
 * [Daily maximum temperature](http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023034)
 * [Daily minimum temperature](http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023034)
+* The data extend as far back as 1955.
+
+![Graph of Airport daily maximum temperatures](airport-summer)
+
+![Graph of Airport daily minimum temperatures](airport-winter)
