@@ -82,7 +82,7 @@ raw_data <- raw_data |>
 raw_data <- raw_data |>
   pivot_longer(-c(Year, Month, Day),
                names_to = "key",
-               values_to = "Temp") %>%
+               values_to = "Temperature") %>%
   separate(key, c("Location", "Type"), sep = "_")
 
 # Output data

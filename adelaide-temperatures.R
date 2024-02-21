@@ -39,7 +39,7 @@ plot_temp <- function(season = 'summer',
   if (leap_years_in_data) {
     leap_year_rows <- relevant_months |>
       filter(Month == 2 & Day == 28) |>
-      mutate(Day = 29, Temp = NA) |>
+      mutate(Day = 29, Temperature = NA) |>
       filter(!leap_year(Year))
     relevant_months <- relevant_months |>
       bind_rows(leap_year_rows) |>
@@ -52,29 +52,29 @@ plot_temp <- function(season = 'summer',
     mutate(Day_number = row_number()) |>
     ungroup()
   
-  # Determine extreme temperatures
+  # Determine extreme temperature categories
   if (season == 'summer')
     temp_cutoffs <- c(30, 35, 40, 48)
   if (season == 'winter')
     temp_cutoffs <- c(5, 3, 0, -10)
   extreme_days <-
     filter(relevant_months, if (season == 'summer') {
-      Temp > 30
+      Temperature > 30
     } else {
-      Temp <= 5
+      Temperature <= 5
     }) |>
-    mutate(Temp_category = cut(Temp, temp_cutoffs)) # Define the classes to display
+    mutate(Temp_category = cut(Temperature, temp_cutoffs)) # Define the classes to display
   
-  # Create text label for the years
+  # Determine graph padding, colours, breaks and labels
+  padding <-
+    4 # Padding for right margin for counts of very extreme temperatures
+  measure_label <- ifelse(season == 'summer', 'Maximum', 'Minimum')
   year_labels <-
     str_c(as.character(seq(end_year - 1, start_year)),
           rep('-', end_year - start_year),
           str_sub(as.character(seq(
             end_year, start_year + 1
           )), -2, -1))
-  
-  # Determine graph properties
-  measure_label <- ifelse(season == 'summer', 'Maximum', 'Minimum')
   if (season == 'summer') {
     colours <- c("salmon", "red2", "black")
     if (leap_years_in_data)
@@ -87,6 +87,8 @@ plot_temp <- function(season = 'summer',
       c("30.1-35.0\u00B0C",
         "35.1-40.0\u00B0C",
         "Above 40.0\u00B0C")
+    direction <- 'above'
+    threshold <- '40.0'
   }
   if (season == 'winter') {
     colours <- c("black", "cornflowerblue", "lightblue")
@@ -96,7 +98,20 @@ plot_temp <- function(season = 'summer',
       c("Below 0.1\u00B0C",
         "0.1-3.0\u00B0C",
         "3.1-5.0\u00B0C")
+    direction <- 'below'
+    threshold <- '0.1'
   }
+  
+  # Count days of very extreme temperatures to display on right side of graph
+  very_extreme_counts <- extreme_days |>
+    group_by(Seasons_ago) |>
+    summarise(Very_extreme_days = sum(
+      if (season == 'summer')
+        Temperature > as.numeric(threshold)
+      else
+        Temperature < as.numeric(threshold)
+    )) |>
+    mutate(x_position = max(month_breaks) + padding)
   
   # Generate graph
   graph <-
@@ -123,7 +138,7 @@ plot_temp <- function(season = 'summer',
         by = 1
       ) / 2,
       labels = month_labels,
-      expand = c(0, 0)
+      expand = expansion(add = c(0, padding))
     ) +
     theme(
       panel.border = element_rect(color = 'black', fill = NA),
@@ -133,17 +148,32 @@ plot_temp <- function(season = 'summer',
       axis.ticks = element_blank(),
       plot.title = element_text(hjust = 0.5),
       plot.title.position = "plot",
+      plot.subtitle = element_text(hjust = 0.5),
       axis.title.x = element_blank(),
       axis.title.y = element_blank(),
       legend.position = "bottom"
     ) +
-    labs(title = paste(
-      "Adelaide",
-      tolower(location),
-      "daily",
-      tolower(measure_label),
-      "temperatures"
-    ))
+    labs(
+      title = paste(
+        "Adelaide",
+        tolower(location),
+        "daily",
+        tolower(measure_label),
+        "temperatures"
+      ),
+      subtitle = paste0(
+        "Numbers on right are counts of days with temperatures ",
+        direction,
+        " ",
+        threshold,
+        "\u00B0C"
+      )
+    ) +
+    geom_text(
+      data = very_extreme_counts,
+      aes(x_position, Seasons_ago, label = Very_extreme_days),
+      inherit.aes = FALSE
+    )
   
   return(graph)
 }
