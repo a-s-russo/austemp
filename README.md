@@ -16,6 +16,6 @@ The data are from the [Australian Bureau of Meterology](http://www.bom.gov.au/?r
 
 ## Graphs
 
-![Graph of Airport daily maximum temperatures](airport-summer.png)
+![Graph of Airport daily maximum temperatures](graph-airport-summer.png)
 
-![Graph of Airport daily minimum temperatures](airport-winter.png)
+![Graph of Airport daily minimum temperatures](graph-airport-winter.png)
