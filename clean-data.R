@@ -1,4 +1,4 @@
-# Load library
+# Load libraries
 library(tidyverse)
 library(padr)
 
@@ -72,7 +72,7 @@ for (URL in URLs) {
   raw_dataset <- raw_dataset |>
     mutate(Date = as.Date(paste(Year, Month, Day, sep = '-'))) |>
     pad(interval = 'day') |>
-    select(-Date)
+    select(Year, Month, Day, Location, Type, Temperature, -Date)
   
   # Remove any starting or ending rows where all measurements are missing
   raw_dataset <- raw_dataset |>
@@ -87,5 +87,5 @@ for (URL in URLs) {
 combined_dataset <- bind_rows(raw_datasets) |>
   arrange(Year, Month, Day)
 
-# Output data
+# Output dataset
 write_csv(combined_dataset, 'data-clean.csv')

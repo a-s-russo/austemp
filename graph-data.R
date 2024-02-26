@@ -84,20 +84,49 @@ plot_temperatures <- function(season = 'summer',
     ungroup()
   
   # Determine extreme temperature categories
+  decimal_places <-
+    max(nchar(gsub(
+      ".*\\.|^[^.]+$", "", as.character(pull(relevant_data, Temperature))
+    )), na.rm = TRUE)
+  decimal_part <- 1 / (10 ^ decimal_places)
   if (season == 'summer') {
     threshold1 <- 30
     threshold2 <- 35
     threshold3 <- 40
-    inf_threshold <- 99
+    threshold1_lower_num <- threshold1 + decimal_part
+    threshold1_lower_chr <- as.character(threshold1_lower_num)
+    threshold1_upper_num <- threshold2
+    threshold1_upper_chr <-
+      sprintf(paste0('%.', decimal_places, 'f'), threshold1_upper_num)
+    threshold2_lower_num <- threshold2 + decimal_part
+    threshold2_lower_chr <- as.character(threshold2_lower_num)
+    threshold2_upper_num <- threshold3
+    threshold2_upper_chr <-
+      sprintf(paste0('%.', decimal_places, 'f'), threshold2_upper_num)
+    threshold3_lower_num <- threshold2_upper_num
+    threshold3_lower_chr <- threshold2_upper_chr
+    threshold_inf <- 99
   }
   if (season == 'winter') {
     threshold1 <- 5
     threshold2 <- 3
     threshold3 <- 0
-    inf_threshold <- -99
+    threshold1_lower_num <- threshold2 + decimal_part
+    threshold1_lower_chr <- as.character(threshold1_lower_num)
+    threshold1_upper_num <- threshold1
+    threshold1_upper_chr <-
+      sprintf(paste0('%.', decimal_places, 'f'), threshold1_upper_num)
+    threshold2_lower_num <- threshold3 + decimal_part
+    threshold2_lower_chr <- as.character(threshold2_lower_num)
+    threshold2_upper_num <- threshold2
+    threshold2_upper_chr <-
+      sprintf(paste0('%.', decimal_places, 'f'), threshold2_upper_num)
+    threshold3_upper_num <- threshold2_lower_num
+    threshold3_upper_chr <- threshold2_lower_chr
+    threshold_inf <- -99
   }
   temp_cutoffs <-
-    c(threshold1, threshold2, threshold3, inf_threshold)
+    c(threshold1, threshold2, threshold3, threshold_inf)
   extreme_days <-
     filter(relevant_data, if (season == 'summer') {
       Temperature > threshold1
@@ -109,11 +138,7 @@ plot_temperatures <- function(season = 'summer',
   # Determine graph properties based on season
   measure_label <- unique(pull(relevant_data, Type))
   temperature_symbol <- "\u00B0C"
-  decimal_places <- 1
-  one_padding <- str_pad('1', decimal_places, pad = '0')
-  zero_padding <- str_pad('0', decimal_places, pad = '0')
-  graph_edge_padding <-
-    4 # Padding for right margin for counts of very extreme temperatures
+  graph_edge_padding <- 4
   if (season == 'summer') {
     colours <- c("salmon", "red2", "black")
     year_breaks <- seq(1, end_year - start_year)
@@ -132,38 +157,23 @@ plot_temperatures <- function(season = 'summer',
     month_labels <-
       c("November", "December", "January", "February", "March")
     direction <- 'above'
-    subtitle_threshold <- threshold3
-    legend_labels <-
-      c(
-        paste0(
-          threshold1,
-          ".",
-          one_padding,
-          "-",
-          threshold2,
-          ".",
-          zero_padding,
-          temperature_symbol
-        ),
-        paste0(
-          threshold2,
-          ".",
-          one_padding,
-          "-",
-          threshold3,
-          ".",
-          zero_padding,
-          temperature_symbol
-        ),
-        paste0(
-          str_to_title(direction),
-          " ",
-          threshold3,
-          ".",
-          zero_padding,
-          temperature_symbol
-        )
-      )
+    subtitle_threshold <- threshold2_upper_chr
+    range1 <-
+      paste0(threshold1_lower_chr,
+             '-',
+             threshold1_upper_chr,
+             temperature_symbol)
+    range2 <-
+      paste0(threshold2_lower_chr,
+             '-',
+             threshold2_upper_chr,
+             temperature_symbol)
+    range3 <-
+      paste0(str_to_title(direction),
+             ' ',
+             threshold3_lower_chr,
+             temperature_symbol)
+    legend_labels <- c(range1, range2, range3)
   }
   if (season == 'winter') {
     colours <- c("black", "cornflowerblue", "lightblue")
@@ -175,49 +185,32 @@ plot_temperatures <- function(season = 'summer',
     month_breaks <- c(0, 31, 61, 92, 123, 153)
     month_labels <- c("May", "June", "July", "August", "September")
     direction <- 'below'
-    subtitle_threshold <- paste0(threshold3, '.', one_padding)
-    legend_labels <-
-      c(
-        paste0(
-          str_to_title(direction),
-          " ",
-          threshold3,
-          ".",
-          one_padding,
-          temperature_symbol
-        ),
-        paste0(
-          threshold3,
-          ".",
-          one_padding,
-          "-",
-          threshold2,
-          ".",
-          zero_padding,
-          temperature_symbol
-        ),
-        paste0(
-          threshold2,
-          ".",
-          one_padding,
-          "-",
-          threshold1,
-          ".",
-          zero_padding,
-          temperature_symbol
-        )
-      )
+    subtitle_threshold <- threshold2_lower_chr
+    range1 <-
+      paste0(threshold1_lower_chr,
+             '-',
+             threshold1_upper_chr,
+             temperature_symbol)
+    range2 <-
+      paste0(threshold2_lower_chr,
+             '-',
+             threshold2_upper_chr,
+             temperature_symbol)
+    range3 <-
+      paste0(str_to_title(direction),
+             ' ',
+             threshold3_upper_chr,
+             temperature_symbol)
+    legend_labels <- c(range3, range2, range1)
   }
   
   # Count days of very extreme temperatures to display on right side of graph
   very_extreme_counts <- extreme_days |>
     group_by(Seasons_ago) |>
-    summarise(Very_extreme_days = sum(
-      if (season == 'summer')
-        Temperature > as.numeric(threshold3)
+    summarise(Very_extreme_days = sum(if (season == 'summer')
+      Temperature > threshold3
       else
-        Temperature < as.numeric(paste0(threshold3, '.', one_padding))
-    )) |>
+        Temperature <= threshold3)) |>
     mutate(x_position = max(month_breaks) + graph_edge_padding)
   
   # Generate graph
@@ -260,13 +253,14 @@ plot_temperatures <- function(season = 'summer',
     ) +
     labs(
       title = paste(
-        str_to_title(location),
-        "daily",
-        tolower(measure_label),
-        "temperatures"
+        "Daily",
+        measure_label,
+        "Temperature",
+        "\n",
+        str_to_title(location)
       ),
       subtitle = paste0(
-        "Numbers on right are counts of days with temperatures ",
+        "Numbers on the right are counts of days with a temperature ",
         direction,
         " ",
         subtitle_threshold,
@@ -281,5 +275,8 @@ plot_temperatures <- function(season = 'summer',
   
   return(graph)
 }
+
 plot_temperatures()
+ggsave('graph-airport-summer.png')
 plot_temperatures(start_year = 1992, season = 'winter')
+ggsave('graph-airport-winter.png')
