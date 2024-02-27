@@ -4,10 +4,10 @@ library(padr)
 
 # Links to download datasets
 URLs <- c(
-  "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_display_type=dailyZippedDataFile&p_stn_num=023000&p_c=-105799042&p_nccObsCode=122&p_startYear=2024",
-  "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_display_type=dailyZippedDataFile&p_stn_num=023000&p_c=-105799238&p_nccObsCode=123&p_startYear=2024",
-  "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_display_type=dailyZippedDataFile&p_stn_num=023034&p_c=-106112074&p_nccObsCode=122&p_startYear=2024",
-  "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_display_type=dailyZippedDataFile&p_stn_num=023034&p_c=-106112270&p_nccObsCode=123&p_startYear=2024"
+  "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_display_type=dailyZippedDataFile&p_stn_num=023000&p_c=-105799246&p_nccObsCode=122&p_startYear=2024",
+  "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_display_type=dailyZippedDataFile&p_stn_num=023000&p_c=-105799442&p_nccObsCode=123&p_startYear=2024",
+  "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_display_type=dailyZippedDataFile&p_stn_num=023034&p_c=-106112277&p_nccObsCode=122&p_startYear=2024",
+  "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_display_type=dailyZippedDataFile&p_stn_num=023034&p_c=-106112473&p_nccObsCode=123&p_startYear=2024"
 )
 
 # Initialise raw datasets list

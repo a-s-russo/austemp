@@ -1,15 +1,16 @@
-# Load library
+# Load libraries
 library(zoo)
 library(tidyverse)
 
-# Read data
-raw_data <- read_csv('data-clean.csv', show_col_types = FALSE)
-
 # Define function to generate graph
-plot_temperatures <- function(season = 'summer',
+plot_temperatures <- function(season,
                               start_year = year(today()) - 31,
                               end_year = year(today()),
-                              location = 'Adelaide Airport') {
+                              location = 'Adelaide Airport',
+                              thresholds) {
+  # Read data
+  raw_data <- read_csv('data-clean.csv', show_col_types = FALSE)
+  
   # Extract relevant months
   relevant_data <- raw_data |>
     filter(
@@ -90,9 +91,9 @@ plot_temperatures <- function(season = 'summer',
     )), na.rm = TRUE)
   decimal_part <- 1 / (10 ^ decimal_places)
   if (season == 'summer') {
-    threshold1 <- 30
-    threshold2 <- 35
-    threshold3 <- 40
+    threshold1 <- thresholds[1]
+    threshold2 <- thresholds[2]
+    threshold3 <- thresholds[3]
     threshold1_lower_num <- threshold1 + decimal_part
     threshold1_lower_chr <- as.character(threshold1_lower_num)
     threshold1_upper_num <- threshold2
@@ -108,9 +109,9 @@ plot_temperatures <- function(season = 'summer',
     threshold_inf <- 99
   }
   if (season == 'winter') {
-    threshold1 <- 5
-    threshold2 <- 3
-    threshold3 <- 0
+    threshold1 <- thresholds[3]
+    threshold2 <- thresholds[2]
+    threshold3 <- thresholds[1]
     threshold1_lower_num <- threshold2 + decimal_part
     threshold1_lower_chr <- as.character(threshold1_lower_num)
     threshold1_upper_num <- threshold1
@@ -133,7 +134,7 @@ plot_temperatures <- function(season = 'summer',
     } else {
       Temperature <= threshold1
     }) |>
-    mutate(Temp_category = cut(Temperature, temp_cutoffs)) # Define the classes to display
+    mutate(Temp_category = cut(Temperature, temp_cutoffs))
   
   # Determine graph properties based on season
   measure_label <- unique(pull(relevant_data, Type))
@@ -203,6 +204,9 @@ plot_temperatures <- function(season = 'summer',
              temperature_symbol)
     legend_labels <- c(range3, range2, range1)
   }
+  legend_levels <-
+    levels(cut(-abs(threshold_inf):abs(threshold_inf), temp_cutoffs))
+  legend_limits <- legend_levels
   
   # Count days of very extreme temperatures to display on right side of graph
   very_extreme_counts <- extreme_days |>
@@ -221,7 +225,8 @@ plot_temperatures <- function(season = 'summer',
     scale_fill_manual(
       values = colours,
       name = paste(measure_label, "temperature:"),
-      labels = legend_labels
+      labels = legend_labels,
+      limits = legend_limits
     ) +
     geom_vline(xintercept = month_breaks + 0.5) +
     scale_y_continuous(breaks = year_breaks,
@@ -252,15 +257,18 @@ plot_temperatures <- function(season = 'summer',
       legend.position = "bottom"
     ) +
     labs(
-      title = paste(
+      title = paste0(
         "Daily",
+        " ",
         measure_label,
+        " ",
         "Temperature",
         "\n",
-        str_to_title(location)
+        trimws(str_to_title(location))
       ),
       subtitle = paste0(
-        "Numbers on the right are counts of days with a temperature ",
+        "Numbers on the right are counts of days with temperatures",
+        " ",
         direction,
         " ",
         subtitle_threshold,
@@ -275,8 +283,9 @@ plot_temperatures <- function(season = 'summer',
   
   return(graph)
 }
-
-plot_temperatures()
+plot_temperatures(season = 'summer', thresholds = c(30, 35, 40))
 ggsave('graph-airport-summer.png')
-plot_temperatures(start_year = 1992, season = 'winter')
+plot_temperatures(season = 'winter',
+                  thresholds = c(0, 3, 5),
+                  start_year = 1992)
 ggsave('graph-airport-winter.png')
