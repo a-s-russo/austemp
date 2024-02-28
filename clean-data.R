@@ -1,6 +1,6 @@
 # Load libraries
-library(tidyverse)
-library(padr)
+suppressMessages(library(tidyverse))
+library(padr, warn.conflicts = FALSE)
 
 # Links to download datasets
 URLs <- c(

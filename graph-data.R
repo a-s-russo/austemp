@@ -1,6 +1,6 @@
 # Load libraries
-library(zoo)
-library(tidyverse)
+library(zoo, warn.conflicts = FALSE)
+suppressMessages(library(tidyverse))
 
 # Define function to generate graph
 plot_temperatures <- function(season,
@@ -198,15 +198,21 @@ plot_temperatures <- function(season,
     direction <- 'above'
     subtitle_threshold <- threshold2_upper_chr
     range1 <-
-      paste0(threshold1_lower_chr,
-             ' to ',
-             threshold1_upper_chr,
-             temperature_symbol)
+      paste0(
+        threshold1_lower_chr,
+        temperature_symbol,
+        ' to ',
+        threshold1_upper_chr,
+        temperature_symbol
+      )
     range2 <-
-      paste0(threshold2_lower_chr,
-             ' to ',
-             threshold2_upper_chr,
-             temperature_symbol)
+      paste0(
+        threshold2_lower_chr,
+        temperature_symbol,
+        ' to ',
+        threshold2_upper_chr,
+        temperature_symbol
+      )
     range3 <-
       paste0(str_to_title(direction),
              ' ',
@@ -229,15 +235,21 @@ plot_temperatures <- function(season,
     direction <- 'below'
     subtitle_threshold <- threshold2_lower_chr
     range1 <-
-      paste0(threshold1_lower_chr,
-             ' to ',
-             threshold1_upper_chr,
-             temperature_symbol)
+      paste0(
+        threshold1_lower_chr,
+        temperature_symbol,
+        ' to ',
+        threshold1_upper_chr,
+        temperature_symbol
+      )
     range2 <-
-      paste0(threshold2_lower_chr,
-             ' to ',
-             threshold2_upper_chr,
-             temperature_symbol)
+      paste0(
+        threshold2_lower_chr,
+        temperature_symbol,
+        ' to ',
+        threshold2_upper_chr,
+        temperature_symbol
+      )
     range3 <-
       paste0(str_to_title(direction),
              ' ',
@@ -325,8 +337,11 @@ plot_temperatures <- function(season,
   return(graph)
 }
 
+# Plot and save summer graph
 plot_temperatures(season = 'summer', thresholds = c(30, 35, 40))
 ggsave('graph-airport-summer.png')
+
+# Plot and save winter graph
 plot_temperatures(
   season = 'winter',
   thresholds = c(0, 3, 5),
