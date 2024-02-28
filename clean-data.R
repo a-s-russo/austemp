@@ -4,10 +4,10 @@ library(padr, warn.conflicts = FALSE)
 
 # Links to download datasets
 URLs <- c(
-  "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_display_type=dailyZippedDataFile&p_stn_num=023000&p_c=-105799246&p_nccObsCode=122&p_startYear=2024",
-  "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_display_type=dailyZippedDataFile&p_stn_num=023000&p_c=-105799442&p_nccObsCode=123&p_startYear=2024",
-  "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_display_type=dailyZippedDataFile&p_stn_num=023034&p_c=-106112277&p_nccObsCode=122&p_startYear=2024",
-  "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_display_type=dailyZippedDataFile&p_stn_num=023034&p_c=-106112473&p_nccObsCode=123&p_startYear=2024"
+  "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023000",
+  "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023000",
+  "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023034",
+  "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023034"
 )
 
 # Initialise raw datasets list
@@ -15,8 +15,17 @@ raw_datasets <- list()
 
 # Extract downloaded datasets
 for (URL in URLs) {
-  # Define headers for user-agent validation
-  headers = c(`user-agent` = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.61 Safari/537.36')
+  # Define user-agent and headers
+  user_agent <-
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36"
+  headers = c(`user-agent` = user_agent)
+  
+  # Extract download link
+  download_attr <- GET(URL, user_agent(user_agent)) |>
+    read_html() |>
+    html_node("#content-block > ul.downloads > li:nth-child(2) > a") |>
+    html_attr('href')
+  download_link <- paste0('http://www.bom.gov.au', download_attr)
   
   # Create temporary file to download zipped file in to
   temp_file <- tempfile(fileext = ".zip")
@@ -25,11 +34,13 @@ for (URL in URLs) {
   temp_dir <- tempfile()
   
   # Download zipped file
-  download.file(URL,
-                temp_file,
-                mode = "wb",
-                headers = headers,
-                quiet = TRUE)
+  download.file(
+    download_link,
+    temp_file,
+    mode = "wb",
+    headers = headers,
+    quiet = TRUE
+  )
   
   # Unzip downloaded file
   unzip(zipfile = temp_file, exdir = temp_dir)
