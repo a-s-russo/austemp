@@ -8,8 +8,37 @@ plot_temperatures <- function(season,
                               end_year = year(today()),
                               location = 'Adelaide Airport',
                               thresholds) {
+  # Validation of season argument
+  stopifnot("The season must be one of 'summer' or 'winter'" = !is.null(season))
+  stopifnot("The season must be one of 'summer' or 'winter'" = str_to_lower(season) %in% c('summer', 'winter'))
+  
+  # Validation of starting and ending year arguments
+  stopifnot('The starting year must be an integer' = !is.null(start_year))
+  stopifnot('The starting year must be an integer' = is.numeric(start_year))
+  stopifnot('The starting year must be an integer' = start_year %% 1 == 0)
+  stopifnot('The ending year must be an integer' = !is.null(end_year))
+  stopifnot('The ending year must be an integer' = is.numeric(end_year))
+  stopifnot('The ending year must be an integer' = end_year %% 1 == 0)
+  stopifnot('The starting year must not be greater than the ending year' = start_year <= end_year)
+  
+  # Validation of thresholds argument
+  stopifnot('Three ascending numeric thresholds must be provided' = !is.null(thresholds))
+  stopifnot('Three ascending numeric thresholds must be provided' = is.numeric(thresholds))
+  stopifnot('Three ascending numeric thresholds must be provided' = length(thresholds) == 3)
+  stopifnot('Three ascending numeric thresholds must be provided' = thresholds[1] < thresholds[2])
+  stopifnot('Three ascending numeric thresholds must be provided' = thresholds[2] < thresholds[3])
+  
   # Read data
   raw_data <- read_csv('data-clean.csv', show_col_types = FALSE)
+  
+  # Validation of location argument
+  stopifnot('The location is not available' = !is.null(location))
+  locations <- unique(pull(raw_data, Location))
+  stopifnot('The location is not available' = str_to_lower(location) %in% str_to_lower(locations))
+  
+  # Argument modifications
+  season <- str_to_lower(season)
+  location <- str_to_title(location)
   
   # Extract relevant months
   relevant_data <- raw_data |>
@@ -23,6 +52,9 @@ plot_temperatures <- function(season,
       Type == ifelse(season == 'summer', 'Maximum', 'Minimum'),
       Location == location
     )
+  
+  # Abort if dataset is empty
+  stopifnot('There are no data to plot' = nrow(relevant_data) > 0)
   
   # Adjust start year
   min_start_year <- relevant_data |>
@@ -62,6 +94,9 @@ plot_temperatures <- function(season,
       filter(Season > 0,
              Seasons_ago > 0)
   }
+  
+  # Abort if dataset is empty
+  stopifnot('There are no data to plot' = nrow(relevant_data) > 0)
   
   # Add rows for February 29th for non-leap-years to align February end date
   leap_years_in_data <-
@@ -106,7 +141,7 @@ plot_temperatures <- function(season,
       sprintf(paste0('%.', decimal_places, 'f'), threshold2_upper_num)
     threshold3_lower_num <- threshold2_upper_num
     threshold3_lower_chr <- threshold2_upper_chr
-    threshold_inf <- 99
+    threshold_inf <- Inf
   }
   if (season == 'winter') {
     threshold1 <- thresholds[3]
@@ -124,7 +159,7 @@ plot_temperatures <- function(season,
       sprintf(paste0('%.', decimal_places, 'f'), threshold2_upper_num)
     threshold3_upper_num <- threshold2_lower_num
     threshold3_upper_chr <- threshold2_lower_chr
-    threshold_inf <- -99
+    threshold_inf <- -Inf
   }
   temp_cutoffs <-
     c(threshold1, threshold2, threshold3, threshold_inf)
@@ -135,6 +170,9 @@ plot_temperatures <- function(season,
       Temperature <= threshold1
     }) |>
     mutate(Temp_category = cut(Temperature, temp_cutoffs))
+  
+  # Abort if dataset is empty
+  stopifnot('There are no data to plot' = nrow(extreme_days) > 0)
   
   # Determine graph properties based on season
   measure_label <- unique(pull(relevant_data, Type))
@@ -161,12 +199,12 @@ plot_temperatures <- function(season,
     subtitle_threshold <- threshold2_upper_chr
     range1 <-
       paste0(threshold1_lower_chr,
-             '-',
+             ' to ',
              threshold1_upper_chr,
              temperature_symbol)
     range2 <-
       paste0(threshold2_lower_chr,
-             '-',
+             ' to ',
              threshold2_upper_chr,
              temperature_symbol)
     range3 <-
@@ -175,6 +213,9 @@ plot_temperatures <- function(season,
              threshold3_lower_chr,
              temperature_symbol)
     legend_labels <- c(range1, range2, range3)
+    legend_levels <-
+      levels(cut((threshold1 - 1):(threshold3 + 1), temp_cutoffs))
+    legend_limits <- legend_levels
   }
   if (season == 'winter') {
     colours <- c("black", "cornflowerblue", "lightblue")
@@ -189,12 +230,12 @@ plot_temperatures <- function(season,
     subtitle_threshold <- threshold2_lower_chr
     range1 <-
       paste0(threshold1_lower_chr,
-             '-',
+             ' to ',
              threshold1_upper_chr,
              temperature_symbol)
     range2 <-
       paste0(threshold2_lower_chr,
-             '-',
+             ' to ',
              threshold2_upper_chr,
              temperature_symbol)
     range3 <-
@@ -203,10 +244,10 @@ plot_temperatures <- function(season,
              threshold3_upper_chr,
              temperature_symbol)
     legend_labels <- c(range3, range2, range1)
+    legend_levels <-
+      levels(cut((threshold3 - 1):(threshold1 + 1), temp_cutoffs))
+    legend_limits <- legend_levels
   }
-  legend_levels <-
-    levels(cut(-abs(threshold_inf):abs(threshold_inf), temp_cutoffs))
-  legend_limits <- legend_levels
   
   # Count days of very extreme temperatures to display on right side of graph
   very_extreme_counts <- extreme_days |>
@@ -283,9 +324,12 @@ plot_temperatures <- function(season,
   
   return(graph)
 }
+
 plot_temperatures(season = 'summer', thresholds = c(30, 35, 40))
 ggsave('graph-airport-summer.png')
-plot_temperatures(season = 'winter',
-                  thresholds = c(0, 3, 5),
-                  start_year = 1992)
+plot_temperatures(
+  season = 'winter',
+  thresholds = c(0, 3, 5),
+  start_year = year(today()) - 32
+)
 ggsave('graph-airport-winter.png')
