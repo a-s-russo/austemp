@@ -1,6 +1,8 @@
 # Load libraries
 suppressMessages(library(tidyverse))
 library(padr, warn.conflicts = FALSE)
+library(rvest, warn.conflicts = FALSE)
+library(httr, warn.conflicts = FALSE)
 
 # Links to download datasets
 URLs <- c(
@@ -21,11 +23,11 @@ for (URL in URLs) {
   headers = c(`user-agent` = user_agent)
   
   # Extract download link
-  download_attr <- GET(URL, user_agent(user_agent)) |>
+  download_link <- GET(URL, user_agent(user_agent)) |>
     read_html() |>
     html_node("#content-block > ul.downloads > li:nth-child(2) > a") |>
-    html_attr('href')
-  download_link <- paste0('http://www.bom.gov.au', download_attr)
+    html_attr('href') |>
+    paste0('http://www.bom.gov.au', . = _)
   
   # Create temporary file to download zipped file in to
   temp_file <- tempfile(fileext = ".zip")
@@ -62,7 +64,8 @@ for (URL in URLs) {
   # Extract temperature type
   relevant_row_number <- grep('^Notes for Daily', notes)
   relevant_row <- notes[relevant_row_number]
-  type <- str_split_i(relevant_row, ' ', 4)
+  type <-
+    str_extract(str_to_title(relevant_row), pattern = str_to_title(c("maximum|minimum")))
   
   # Extract raw dataset
   raw_dataset <-
