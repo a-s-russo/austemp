@@ -1,21 +1,10 @@
 # Adelaide temperatures
-Graphs of Adelaide city and airport maximum and minimum temperatures in summer and winter
+A pipeline to produce graphs of Adelaide airport maximum and minimum temperatures in summer and winter, respectively.
 
-## Data
-The data are from the [Australian Bureau of Meterology](http://www.bom.gov.au/?ref=logo) website. Temperature measurements can be downloaded for all years for the following stations:
+## How to run
 
-**Adelaide (West Terrace / Ngayirdapira)** (station number 23000):
-* [Daily maximum temperature](http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023000)
-* [Daily minimum temperature](http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023000)
-* There are no data from 1980 to 2016.
-
-**Adelaide Airport** (station number 23034):
-* [Daily maximum temperature](http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023034)
-* [Daily minimum temperature](http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023034)
-* The data extend as far back as 1955.
-
-## Graphs
-
-![Graph of Airport daily maximum temperatures](graph-airport-summer.png)
-
-![Graph of Airport daily minimum temperatures](graph-airport-winter.png)
+- Clone the repository: `git clone https://github.com/a-s-russo/Adelaide-temperatures.git`.
+- Switch to the `pipeline` branch: `git switch pipeline`.
+- Start an R session in the folder and use `renv::restore()` (and `renv::status()` as necessary) to install the project’s dependencies (or just open the R project file `Adelaide-temperatures.Rproj`).
+- Run the pipeline sequentially with `targets::tar_make()` or in parallel with `targets::tar_make_future(workers = 2)` (the latter should be quicker).
+- Inspect the images `graph-airport-summer.png` and `graph-airport-winter.png` for the output.
