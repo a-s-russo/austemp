@@ -42,8 +42,9 @@ The hyperlinks are the same except for the parts containing the:
 \itemize{
 \item \strong{product code:} 122 = maximum; 123 = minimum
 \item \strong{station number:} a six-digit code
-(See the example for the valid URL format.)
 }
+
+See the examples section for the valid URL format.
 }
 \examples{
 \dontrun{
@@ -59,5 +60,5 @@ download_temperatures(URLs = paste0(URLpart1, product, URLpart2, station))
 
 }
 \seealso{
-to come
+\code{\link{plot_temperatures}}
 }
