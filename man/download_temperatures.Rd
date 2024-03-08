@@ -40,20 +40,21 @@ Any download links must resemble one of the default ones provided below:
 
 The hyperlinks are the same except for the parts containing the:
 \itemize{
-\item \strong{product code} (122 = maximum; 123 = minimum)
-\item \strong{station number} (a six-digit code)
+\item \strong{product code:} 122 = maximum; 123 = minimum
+\item \strong{station number:} a six-digit code
+(See the example for the valid URL format.)
 }
 }
 \examples{
 \dontrun{
-   # Download Sydney data instead of default (Adelaide) data
-   # Station: Sydney Airport AMO (number 066037)
-   # Product: Daily maximum temperature
-   URLpart1 <- "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode="
-   product <- "122"
-   URLpart2 <- "&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num="
-   station <- "066037"
-   download_temperatures(URLs = paste0(URLpart1, product, URLpart2, station))
+# Download Sydney data instead of default (Adelaide) data
+# Station: Sydney Airport AMO (number 066037)
+# Product: Daily maximum temperature
+URLpart1 <- "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode="
+product <- "122"
+URLpart2 <- "&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num="
+station <- "066037"
+download_temperatures(URLs = paste0(URLpart1, product, URLpart2, station))
 }
 
 }

@@ -21,8 +21,9 @@
 #' * \href{http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023034}{Adelaide Airport daily minimum temperature}
 #' 
 #' The hyperlinks are the same except for the parts containing the:
-#' * \strong{product code} (122 = maximum; 123 = minimum)
-#' * \strong{station number} (a six-digit code)
+#' * \strong{product code:} 122 = maximum; 123 = minimum
+#' * \strong{station number:} a six-digit code
+#' (See the example for the valid URL format.)
 #' 
 #' @param URLs A character vector of one or more specified download links.
 #' Default links are for Adelaide temperature data (see the details section)
@@ -43,14 +44,14 @@
 #' 
 #' @examples
 #' \dontrun{
-#'    # Download Sydney data instead of default (Adelaide) data
-#'    # Station: Sydney Airport AMO (number 066037)
-#'    # Product: Daily maximum temperature
-#'    URLpart1 <- "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode="
-#'    product <- "122"
-#'    URLpart2 <- "&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num="
-#'    station <- "066037"
-#'    download_temperatures(URLs = paste0(URLpart1, product, URLpart2, station))
+#' # Download Sydney data instead of default (Adelaide) data
+#' # Station: Sydney Airport AMO (number 066037)
+#' # Product: Daily maximum temperature
+#' URLpart1 <- "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode="
+#' product <- "122"
+#' URLpart2 <- "&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num="
+#' station <- "066037"
+#' download_temperatures(URLs = paste0(URLpart1, product, URLpart2, station))
 #' }
 #'
 #' @export
@@ -61,10 +62,14 @@ download_temperatures <-
     "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023034",
     "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023034"
   )) {
+    # Define user-agent and headers
+    user_agent <-
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36"
+    headers = c(`user-agent` = user_agent)
+    
     # Validate URLs argument
-    stopifnot("The URL(s) are not valid" = !is.null(URLs))
-    stopifnot("The URL(s) are not valid" = is.character(URLs) == TRUE)
-    stopifnot("The URL(s) are not valid" = !all(unlist(lapply(URLs, http_error))) == TRUE)
+    stopifnot("No URL(s) were provided" = !is.null(URLs))
+    stopifnot("The URL(s) must be expressed as character strings" = is.character(URLs) == TRUE)
     stopifnot("The URL(s) are not valid" = all(unlist(
       lapply(
         URLs,
@@ -72,17 +77,15 @@ download_temperatures <-
         "^\\Qhttp://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=\\E\\d{3}\\Q&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=\\E\\d{6}$"
       )
     )) == TRUE)
+    stopifnot("The URL(s) returned an error" = !all(unlist(lapply(
+      URLs, http_error, user_agent(user_agent)
+    ))) == TRUE)
     
     # Initialise raw datasets list
     raw_datasets <- list()
     
     # Extract downloaded datasets
     for (URL in URLs) {
-      # Define user-agent and headers
-      user_agent <-
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36"
-      headers = c(`user-agent` = user_agent)
-      
       # Extract download link
       download_link <- GET(URL, user_agent(user_agent)) |>
         read_html() |>
