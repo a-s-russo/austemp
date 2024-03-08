@@ -1,0 +1,13 @@
+flat_minimal_package.Rmd:
+  path: dev/flat_minimal_package.Rmd
+  state: active
+  R: R/download_temperatures.R
+  tests: []
+  vignettes: []
+  inflate:
+    flat_file: dev/flat_minimal_package.Rmd
+    vignette_name: .na
+    open_vignette: true
+    check: true
+    document: true
+    overwrite: 'yes'

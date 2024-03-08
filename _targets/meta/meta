@@ -1,8 +1,0 @@
-name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
-download_temperatures|function|7da6152bcda0a77d
-plot_temperatures|function|f44d88ebf19b36b9
-data|stem|96d0c132fb0e4124|b013600f269e5f6e|a0d2aaada4197308|33550471||t19789.0767152562s|df9f08fc940b6aba|279783|rds|local|vector|||11.01||
-plot_summer|stem|a68476e337a6c555|7469d8c3022ccbe7|e3c58819f4845c12|-1495524544||t19789.0767733096s|a9a4958e407bb82f|454478|rds|local|vector|||0.87||
-plot_winter|stem|5e1c28e19bb4fedf|2de6823ec9191f2f|e3c58819f4845c12|-1718963082||t19789.0767801784s|a5991d3731e13e1a|446081|rds|local|vector|||0.87||
-image_summer|stem|0149eb75b4c403ce|13485c37c5e765b1|e2649d82a17ea717|-328495840||t19789.0768389914s|dff9495c51b724c1|77|rds|local|vector|||1.07||
-image_winter|stem|10660ba585919aff|5e56e28d6ce8d6f8|f1894d528ba3b4cd|-2051939289||t19789.0768461319s|dff9495c51b724c1|77|rds|local|vector|||1.16||

@@ -1,0 +1,39 @@
+---
+title: "Development actions history"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r description}
+# Describe your package
+fusen::fill_description(
+  pkg = here::here(),
+  fields = list(
+    Title = "Graphs of Adelaide temperatures in summer and winter",
+    Version = "0.1",
+    Description = "This package contains functions to download data for and graph Adelaide city and airport maximum and minimum daily temperatures in summer and winter.",
+    `Authors@R` = c(person(
+      "A", "Russo", email = "a.s.russo@outlook.com", role = c("aut", "cre")
+    ))
+  ),
+  overwrite = TRUE
+)
+# Define License with use_*_license()
+usethis::use_gpl_license()
+```
+
+# Set extra sources of documentation
+
+```{r, eval=FALSE}
+# Install a first time
+remotes::install_local()
+# README
+usethis::use_readme_rmd()
+```
+
+# Inflate flat file
+
+```{r development-inflate, eval=FALSE}
+fusen::inflate(flat_file = "dev/flat_minimal_package.Rmd", vignette_name = NA, overwrite = TRUE)
+```
