@@ -1,11 +1,11 @@
 Package: austemp
-Title: Graphs Of Adelaide Temperatures In Summer And Winter
+Title: Graphs Of Australian Temperatures In Summer And Winter
 Version: 0.1
 Authors@R: 
     person("A", "Russo", , "a.s.russo@outlook.com", role = c("aut", "cre"))
-Description: This package contains functions to download data for and
-    graph Adelaide city and airport maximum and minimum daily temperatures
-    in summer and winter.
+Description: This package contains functions to download data for
+    Australian weather stations and to graph their maximum and minimum
+    daily temperatures in summer and winter.
 License: GPL (>= 3)
 Imports: 
     dplyr,

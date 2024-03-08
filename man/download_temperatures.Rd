@@ -2,25 +2,61 @@
 % Please edit documentation in R/download_temperatures.R
 \name{download_temperatures}
 \alias{download_temperatures}
-\title{Download and clean Adelaide temperature data}
+\title{Download and clean Australian temperature data}
 \usage{
-download_temperatures()
+download_temperatures(
+  URLs =
+    c("http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023000",
+    "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023000",
+    "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023034",
+    "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023034")
+)
+}
+\arguments{
+\item{URLs}{A character vector of one or more specified download links.
+Default links are for Adelaide temperature data (see the details section)}
 }
 \value{
-A tibble of temperature data
+The cleaned and combined temperature data
 }
 \description{
-\code{download_temperatures} downloads maximum and minimum daily temperatures
-for Adelaide, cleans and reformats the data, and returns the combined data.
+\code{download_temperatures} downloads maximum and/or minimum daily temperatures
+for Australian weather stations, cleans and reformats the data, and returns
+the combined data.
 }
 \details{
-The data are from the \href{http://www.bom.gov.au/?ref=logo}{Australian
-Bureau of Meteorology}. Temperature measurements are downloaded for all years
-for the following stations in Adelaide, South Australia:
+Daily maximum and/or minimum data for all years for multiple Australian
+weather stations can be downloaded from the
+\href{http://www.bom.gov.au/climate/data/}{Climate Data Online section} of
+the Australian Bureau of Meteorology website.
+
+Any download links must resemble one of the default ones provided below:
 \itemize{
-\item Adelaide (West Terrace / Ngayirdapira) (station number 23000) (there are no
-data from 1980 to 2016); and
-\item Adelaide Airport (station number 23034) (the data extend as far back as
-1955).
+\item \href{http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023000}{Adelaide (West Terrace / Ngayirdapira) daily maximum temperature}
+\item \href{http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023000}{Adelaide (West Terrace / Ngayirdapira) daily minimum temperature}
+\item \href{http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023034}{Adelaide Airport daily maximum temperature}
+\item \href{http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023034}{Adelaide Airport daily minimum temperature}
 }
+
+The hyperlinks are the same except for the parts containing the:
+\itemize{
+\item \strong{product code} (122 = maximum; 123 = minimum)
+\item \strong{station number} (a six-digit code)
+}
+}
+\examples{
+\dontrun{
+   # Download Sydney data instead of default (Adelaide) data
+   # Station: Sydney Airport AMO (number 066037)
+   # Product: Daily maximum temperature
+   URLpart1 <- "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode="
+   product <- "122"
+   URLpart2 <- "&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num="
+   station <- "066037"
+   download_temperatures(URLs = paste0(URLpart1, product, URLpart2, station))
+}
+
+}
+\seealso{
+to come
 }
