@@ -68,5 +68,6 @@ plot_temperatures(data = adelaide_data,
 
 }
 \seealso{
-\code{\link{download_temperatures}}, \code{\link{check_temperatures}}
+\code{\link{download_temperatures}}, \code{\link{check_temperatures}},
+\code{\link{get_locations}}
 }

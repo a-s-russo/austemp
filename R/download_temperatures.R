@@ -27,7 +27,8 @@
 #' See the examples section for the valid URL format.
 #' 
 #' The data returned by `download_temperatures()` can then be graphed using
-#' \code{\link{plot_temperatures}}.
+#' \code{\link{plot_temperatures}}. Locations can be extracted using
+#' \code{\link{get_locations}}.
 #' 
 #' @param URLs A character vector of one or more specified download links.
 #' Default links are for Adelaide temperature data (see the details section)
@@ -44,7 +45,7 @@
 #' @return The cleaned and combined temperature data
 #' 
 #' @seealso
-#' \code{\link{plot_temperatures}}
+#' \code{\link{plot_temperatures}}, \code{\link{get_locations}}
 #' 
 #' @examples
 #' \dontrun{
@@ -185,7 +186,7 @@ download_temperatures <-
     
     # Return combined datasets
     return(combined_dataset)
-  }
+}
 
 #' @title
 #' Check if Australian temperature data are in the expected format
@@ -262,6 +263,9 @@ check_temperatures <- function(data) {
 #' 
 #' @return Sorted, unique locations from the temperature dataset
 #' 
+#' @seealso
+#' \code{\link{download_temperatures}}, \code{\link{check_temperatures}}
+#' 
 #' @examples
 #' \dontrun{
 #' # Download Adelaide temperature data (the default)
@@ -318,20 +322,22 @@ get_locations <- function(data) {
 #' @param thresholds Three ascending numeric thresholds that define the
 #' extreme temperatures to graph
 #' 
-#' @importFrom dplyr arrange bind_rows filter group_by if_else mutate pull
-#' row_number summarise ungroup
+#' @importFrom dplyr arrange bind_rows filter group_by if_else left_join mutate
+#' pull row_number select summarise ungroup
 #' @importFrom ggplot2 aes element_blank element_rect element_text expansion
 #' geom_text geom_tile geom_vline ggplot labs scale_fill_manual
 #' scale_x_continuous scale_y_continuous theme
 #' @importFrom lubridate leap_year today year
 #' @importFrom rlang .data
 #' @importFrom stringr str_c str_sub str_to_lower str_to_title
+#' @importFrom tidyr replace_na
 #' @importFrom zoo rollapply
 #' 
 #' @return A temperature graph
 #' 
 #' @seealso
-#' \code{\link{download_temperatures}}, \code{\link{check_temperatures}}
+#' \code{\link{download_temperatures}}, \code{\link{check_temperatures}},
+#' \code{\link{get_locations}}
 #' 
 #' @examples
 #' \dontrun{
@@ -623,6 +629,10 @@ plot_temperatures <- function(data,
           .data$Temperature <= threshold3
       )
     ) |>
+    left_join(x = unique(select(relevant_data, .data$Seasons_ago)),
+              y = _,
+              by = "Seasons_ago") |>
+    replace_na(replace = list(Very_extreme_days = 0)) |>
     mutate(x_position = max(month_breaks) + graph_edge_padding)
   
   # Generate graph

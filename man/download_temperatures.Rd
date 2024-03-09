@@ -47,7 +47,8 @@ The hyperlinks are the same except for the parts containing the:
 See the examples section for the valid URL format.
 
 The data returned by \code{download_temperatures()} can then be graphed using
-\code{\link{plot_temperatures}}.
+\code{\link{plot_temperatures}}. Locations can be extracted using
+\code{\link{get_locations}}.
 }
 \examples{
 \dontrun{
@@ -63,5 +64,5 @@ download_temperatures(URLs = paste0(URLpart1, product, URLpart2, station))
 
 }
 \seealso{
-\code{\link{plot_temperatures}}
+\code{\link{plot_temperatures}}, \code{\link{get_locations}}
 }

@@ -17,6 +17,7 @@ Imports:
     rlang,
     rvest,
     stringr,
+    tidyr,
     utils,
     zoo
 Suggests: 

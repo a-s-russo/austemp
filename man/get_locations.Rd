@@ -27,3 +27,6 @@ get_locations(adelaide_data)
 }
 
 }
+\seealso{
+\code{\link{download_temperatures}}, \code{\link{check_temperatures}}
+}
