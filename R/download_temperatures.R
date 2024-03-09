@@ -4,7 +4,7 @@
 #' Download and clean Australian temperature data
 #' 
 #' @description
-#' `download_temperatures` downloads maximum and/or minimum daily temperatures
+#' `download_temperatures()` downloads maximum and/or minimum daily temperatures
 #' for Australian weather stations, cleans and reformats the data, and returns
 #' the combined data.
 #'
@@ -25,6 +25,9 @@
 #' * \strong{station number:} a six-digit code
 #' 
 #' See the examples section for the valid URL format.
+#' 
+#' The data returned by `download_temperatures()` can then be graphed using
+#' \code{\link{plot_temperatures}}.
 #' 
 #' @param URLs A character vector of one or more specified download links.
 #' Default links are for Adelaide temperature data (see the details section)
@@ -182,19 +185,82 @@ download_temperatures <-
     
     # Return combined datasets
     return(combined_dataset)
+  }
+
+#' @title
+#' Check if Australian temperature data are in the expected format
+#' 
+#' @description
+#' `check_temperatures()` checks if an object conforms to the format as per the dataset
+#' returned from \code{\link{download_temperatures}} containing temperatures for
+#' Australian weather stations.
+#' 
+#' @details
+#' An error is thrown if the object does not conform to the required format.
+#' Otherwise the function returns nothing. Only limited error checking is
+#' undertaken, such as checking for appropriate variable names and types.
+#' Logical checks for aspects such as consistency within the dataset are not
+#' performed.
+#' 
+#' @param data The object to be checked
+#' 
+#' @importFrom dplyr pull
+#' @importFrom rlang .data
+#' 
+#' @seealso
+#' \code{\link{download_temperatures}}, \code{\link{plot_temperatures}}
+#' 
+#' @examples
+#' \dontrun{
+#' # Download Adelaide temperature data (the default)
+#' adelaide_data <- download_temperatures()
+#'
+#' # Check the data for validity (nothing happens if valid)
+#' check_temperatures(adelaide_data)
+#' }
+#'
+#' @export
+check_temperatures <- function(data) {
+  # Check object
+  stopifnot("No data object was provided" = !is.null(data))
+  stopifnot("Data object not of the expected class" = is.data.frame(data) == TRUE)
+  
+  # Check variables
+  error_flag <- FALSE
+  if (any(duplicated(colnames(data))))
+    error_flag <- TRUE
+  if (!("Year" %in% colnames(data)) |
+      is.numeric(pull(data, .data$Year)) == FALSE)
+    error_flag <- TRUE
+  if (!("Month" %in% colnames(data)) |
+      is.numeric(pull(data, .data$Month)) == FALSE)
+    error_flag <- TRUE
+  if (!("Day" %in% colnames(data)) |
+      is.numeric(pull(data, .data$Day)) == FALSE)
+    error_flag <- TRUE
+  if (!("Location" %in% colnames(data)) |
+      is.character(pull(data, .data$Location)) == FALSE)
+    error_flag <- TRUE
+  if (!("Type" %in% colnames(data)) |
+      is.character(pull(data, .data$Type)) == FALSE)
+    error_flag <- TRUE
+  if (!("Temperature" %in% colnames(data)) |
+      is.numeric(pull(data, .data$Temperature)) == FALSE)
+    error_flag <- TRUE
+  stopifnot("Not all required variables exist, are unique, and/or are in the right format" = error_flag == FALSE)
 }
 
 #' @title
 #' Graph Australian temperature data
 #' 
 #' @description
-#' `plot_temperatures` graphs maximum or minimum daily temperatures
+#' `plot_temperatures()` graphs maximum or minimum daily temperatures
 #' for Australian weather stations.
 #'
 #' @details
 #' Graphs for summer (maximum temperatures) or winter (minimum temperatures) can
 #' be produced for a single weather station using the dataset returned from
-#' `download_temperatures`.
+#' \code{\link{download_temperatures}}.
 #' 
 #' If the starting and ending years provided are beyond the range of data, then
 #' the earliest and latest available years will be used, respectively.
@@ -207,8 +273,8 @@ download_temperatures <-
 #' resulting graph (unless the current year is chosen but it is not yet
 #' complete).
 #' 
-#' @param data  The tibble returned from `download_temperatures` containing
-#' temperature data
+#' @param data  The tibble returned from \code{\link{download_temperatures}}
+#' containing temperature data
 #' @param season One of `summer` or `winter`
 #' @param start_year The starting year for the range of data to graph. Default
 #' is 31 years ago from the current year
@@ -216,7 +282,7 @@ download_temperatures <-
 #' the current year
 #' @param location The weather station in `data` to graph temperatures for.
 #' Default is a location in the default data returned from
-#' `download_temperatures`
+#' \code{\link{download_temperatures}}
 #' @param thresholds Three ascending numeric thresholds that define the
 #' extreme temperatures to graph
 #' 
@@ -233,10 +299,17 @@ download_temperatures <-
 #' @return A temperature graph
 #' 
 #' @seealso
-#' \code{\link{download_temperatures}}
+#' \code{\link{download_temperatures}}, \code{\link{check_temperatures}}
 #' 
 #' @examples
 #' \dontrun{
+#' # Download Adelaide temperature data (the default)
+#' adelaide_data <- download_temperatures()
+#'
+#' # Graph daily maximum temperatures
+#' plot_temperatures(data = adelaide_data,
+#'                   season = "summer",
+#'                   thresholds = c(30, 35, 40))
 #' }
 #'
 #' @export
@@ -247,11 +320,14 @@ plot_temperatures <- function(data,
                               end_year = year(today()),
                               location = 'Adelaide Airport',
                               thresholds) {
-  # Validation of season argument
+  # Validate data argument
+  check_temperatures(data)
+  
+  # Validate season argument
   stopifnot("The season must be one of 'summer' or 'winter'" = !is.null(season))
   stopifnot("The season must be one of 'summer' or 'winter'" = str_to_lower(season) %in% c('summer', 'winter'))
   
-  # Validation of starting and ending year arguments
+  # Validate starting and ending year arguments
   stopifnot('The starting year must be an integer' = !is.null(start_year))
   stopifnot('The starting year must be an integer' = is.numeric(start_year))
   stopifnot('The starting year must be an integer' = start_year %% 1 == 0)
@@ -260,14 +336,14 @@ plot_temperatures <- function(data,
   stopifnot('The ending year must be an integer' = end_year %% 1 == 0)
   stopifnot('The starting year must not be greater than the ending year' = start_year <= end_year)
   
-  # Validation of thresholds argument
+  # Validate thresholds argument
   stopifnot('Three ascending numeric thresholds must be provided' = !is.null(thresholds))
   stopifnot('Three ascending numeric thresholds must be provided' = is.numeric(thresholds))
   stopifnot('Three ascending numeric thresholds must be provided' = length(thresholds) == 3)
   stopifnot('Three ascending numeric thresholds must be provided' = thresholds[1] < thresholds[2])
   stopifnot('Three ascending numeric thresholds must be provided' = thresholds[2] < thresholds[3])
   
-  # Validation of location argument
+  # Validate location argument
   stopifnot('The location is not available' = !is.null(location))
   locations <- unique(pull(data, .data$Location))
   stopifnot('The location is not available' = str_to_lower(location) %in% str_to_lower(locations))

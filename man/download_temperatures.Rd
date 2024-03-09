@@ -20,7 +20,7 @@ Default links are for Adelaide temperature data (see the details section)}
 The cleaned and combined temperature data
 }
 \description{
-\code{download_temperatures} downloads maximum and/or minimum daily temperatures
+\code{download_temperatures()} downloads maximum and/or minimum daily temperatures
 for Australian weather stations, cleans and reformats the data, and returns
 the combined data.
 }
@@ -45,6 +45,9 @@ The hyperlinks are the same except for the parts containing the:
 }
 
 See the examples section for the valid URL format.
+
+The data returned by \code{download_temperatures()} can then be graphed using
+\code{\link{plot_temperatures}}.
 }
 \examples{
 \dontrun{

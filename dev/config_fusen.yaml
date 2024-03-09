@@ -2,7 +2,7 @@ flat_minimal_package.Rmd:
   path: dev/flat_minimal_package.Rmd
   state: active
   R: R/download_temperatures.R
-  tests: []
+  tests: tests/testthat/test-download_temperatures.R
   vignettes: []
   inflate:
     flat_file: dev/flat_minimal_package.Rmd

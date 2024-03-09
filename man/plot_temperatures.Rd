@@ -14,8 +14,8 @@ plot_temperatures(
 )
 }
 \arguments{
-\item{data}{The tibble returned from \code{download_temperatures} containing
-temperature data}
+\item{data}{The tibble returned from \code{\link{download_temperatures}}
+containing temperature data}
 
 \item{season}{One of \code{summer} or \code{winter}}
 
@@ -27,7 +27,7 @@ the current year}
 
 \item{location}{The weather station in \code{data} to graph temperatures for.
 Default is a location in the default data returned from
-\code{download_temperatures}}
+\code{\link{download_temperatures}}}
 
 \item{thresholds}{Three ascending numeric thresholds that define the
 extreme temperatures to graph}
@@ -36,13 +36,13 @@ extreme temperatures to graph}
 A temperature graph
 }
 \description{
-\code{plot_temperatures} graphs maximum or minimum daily temperatures
+\code{plot_temperatures()} graphs maximum or minimum daily temperatures
 for Australian weather stations.
 }
 \details{
 Graphs for summer (maximum temperatures) or winter (minimum temperatures) can
 be produced for a single weather station using the dataset returned from
-\code{download_temperatures}.
+\code{\link{download_temperatures}}.
 
 If the starting and ending years provided are beyond the range of data, then
 the earliest and latest available years will be used, respectively.
@@ -57,9 +57,16 @@ complete).
 }
 \examples{
 \dontrun{
+# Download Adelaide temperature data (the default)
+adelaide_data <- download_temperatures()
+
+# Graph daily maximum temperatures
+plot_temperatures(data = adelaide_data,
+                  season = "summer",
+                  thresholds = c(30, 35, 40))
 }
 
 }
 \seealso{
-\code{\link{download_temperatures}}
+\code{\link{download_temperatures}}, \code{\link{check_temperatures}}
 }

@@ -19,6 +19,8 @@ Imports:
     stringr,
     utils,
     zoo
+Suggests: 
+    testthat
 Config/fusen/version: 0.5.2
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
