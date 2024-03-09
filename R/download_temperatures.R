@@ -251,6 +251,38 @@ check_temperatures <- function(data) {
 }
 
 #' @title
+#' Get all locations from Australian temperature data
+#' 
+#' @description
+#' `get_locations()` returns all unique locations (weather stations) in the
+#' temperature dataset returned by \code{\link{download_temperatures}}.
+#' 
+#' @param data The tibble returned from \code{\link{download_temperatures}}
+#' containing temperature data
+#' 
+#' @return Sorted, unique locations from the temperature dataset
+#' 
+#' @examples
+#' \dontrun{
+#' # Download Adelaide temperature data (the default)
+#' adelaide_data <- download_temperatures()
+#'
+#' # Extract locations
+#' get_locations(adelaide_data)
+#' }
+#'
+#' @export
+get_locations <- function(data) {
+  # Validate data argument
+  check_temperatures(data)
+  
+  # Return locations
+  return(sort(unique(pull(
+    data, .data$Location
+  ))))
+}
+
+#' @title
 #' Graph Australian temperature data
 #' 
 #' @description
@@ -281,8 +313,8 @@ check_temperatures <- function(data) {
 #' @param end_year The ending year for the range of data to graph. Default is
 #' the current year
 #' @param location The weather station in `data` to graph temperatures for.
-#' Default is a location in the default data returned from
-#' \code{\link{download_temperatures}}
+#' If `NULL` provided (the default value), then the last location from
+#' `get_locations(data)` is used
 #' @param thresholds Three ascending numeric thresholds that define the
 #' extreme temperatures to graph
 #' 
@@ -318,7 +350,7 @@ plot_temperatures <- function(data,
                               season,
                               start_year = year(today()) - 31,
                               end_year = year(today()),
-                              location = 'Adelaide Airport',
+                              location = NULL,
                               thresholds) {
   # Validate data argument
   check_temperatures(data)
@@ -344,8 +376,10 @@ plot_temperatures <- function(data,
   stopifnot('Three ascending numeric thresholds must be provided' = thresholds[2] < thresholds[3])
   
   # Validate location argument
-  stopifnot('The location is not available' = !is.null(location))
-  locations <- unique(pull(data, .data$Location))
+  if (is.null(location)) {
+    location <- last(get_locations(data))
+  }
+  locations <- get_locations(data)
   stopifnot('The location is not available' = str_to_lower(location) %in% str_to_lower(locations))
   
   # Argument modifications

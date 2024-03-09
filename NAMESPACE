@@ -2,6 +2,7 @@
 
 export(check_temperatures)
 export(download_temperatures)
+export(get_locations)
 export(plot_temperatures)
 importFrom(dplyr,arrange)
 importFrom(dplyr,bind_rows)

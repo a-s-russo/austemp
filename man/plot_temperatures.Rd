@@ -9,7 +9,7 @@ plot_temperatures(
   season,
   start_year = year(today()) - 31,
   end_year = year(today()),
-  location = "Adelaide Airport",
+  location = NULL,
   thresholds
 )
 }
@@ -26,8 +26,8 @@ is 31 years ago from the current year}
 the current year}
 
 \item{location}{The weather station in \code{data} to graph temperatures for.
-Default is a location in the default data returned from
-\code{\link{download_temperatures}}}
+If \code{NULL} provided (the default value), then the last location from
+\code{get_locations(data)} is used}
 
 \item{thresholds}{Three ascending numeric thresholds that define the
 extreme temperatures to graph}
