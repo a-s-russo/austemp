@@ -329,6 +329,7 @@ get_locations <- function(data) {
 #' scale_x_continuous scale_y_continuous theme
 #' @importFrom lubridate leap_year today year
 #' @importFrom rlang .data
+#' @importFrom stats na.omit
 #' @importFrom stringr str_c str_sub str_to_lower str_to_title
 #' @importFrom tidyr replace_na
 #' @importFrom zoo rollapply
@@ -526,10 +527,14 @@ plot_temperatures <- function(data,
     } else {
       .data$Temperature <= threshold1
     }) |>
+    # Ensure all years are present for plotting on y-axis
+    left_join(x = unique(select(relevant_data, c("Seasons_ago"))),
+              y = _,
+              by = "Seasons_ago") |>
     mutate(Temp_category = cut(.data$Temperature, temp_cutoffs))
   
   # Abort if dataset is empty
-  stopifnot('There are no data to plot' = nrow(extreme_days) > 0)
+  stopifnot('There are no data to plot' = nrow(na.omit(extreme_days)) > 0)
   
   # Determine graph properties based on season
   measure_label <- unique(pull(relevant_data, .data$Type))
@@ -629,6 +634,7 @@ plot_temperatures <- function(data,
           .data$Temperature <= threshold3
       )
     ) |>
+    # Ensure no years with missing counts on graph
     left_join(x = unique(select(relevant_data, .data$Seasons_ago)),
               y = _,
               by = "Seasons_ago") |>
@@ -639,9 +645,14 @@ plot_temperatures <- function(data,
   graph <-
     ggplot(
       extreme_days,
-      aes(.data$Day_number, .data$Seasons_ago, fill = .data$Temp_category)
+      aes(
+        .data$Day_number,
+        .data$Seasons_ago,
+        fill = .data$Temp_category,
+        na.rm = FALSE
+      )
     ) +
-    geom_tile() +
+    geom_tile(na.rm = TRUE) +
     scale_fill_manual(
       values = colours,
       name = paste(measure_label, "temperature:"),
