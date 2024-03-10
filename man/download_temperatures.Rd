@@ -55,10 +55,10 @@ The data returned by \code{download_temperatures()} can then be graphed using
 # Download Sydney data instead of default (Adelaide) data
 # Station: Sydney Airport AMO (number 066037)
 # Product: Daily maximum temperature
-URLpart1 <- "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode="
-product <- "122"
-URLpart2 <- "&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num="
-station <- "066037"
+URLpart1 <- 'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode='
+product <- '122'
+URLpart2 <- '&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num='
+station <- '066037'
 download_temperatures(URLs = paste0(URLpart1, product, URLpart2, station))
 }
 

@@ -62,7 +62,7 @@ adelaide_data <- download_temperatures()
 
 # Graph daily maximum temperatures
 plot_temperatures(data = adelaide_data,
-                  season = "summer",
+                  season = 'summer',
                   thresholds = c(30, 35, 40))
 }
 

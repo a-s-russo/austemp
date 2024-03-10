@@ -52,37 +52,37 @@
 #' # Download Sydney data instead of default (Adelaide) data
 #' # Station: Sydney Airport AMO (number 066037)
 #' # Product: Daily maximum temperature
-#' URLpart1 <- "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode="
-#' product <- "122"
-#' URLpart2 <- "&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num="
-#' station <- "066037"
+#' URLpart1 <- 'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode='
+#' product <- '122'
+#' URLpart2 <- '&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num='
+#' station <- '066037'
 #' download_temperatures(URLs = paste0(URLpart1, product, URLpart2, station))
 #' }
 #'
 #' @export
 download_temperatures <-
   function(URLs = c(
-    "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023000",
-    "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023000",
-    "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023034",
-    "http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023034"
+    'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023000',
+    'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023000',
+    'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023034',
+    'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023034'
   )) {
     # Define user-agent and headers
     user_agent <-
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36"
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36'
     headers = c(`user-agent` = user_agent)
     
     # Validate URLs argument
-    stopifnot("No URL(s) were provided" = !is.null(URLs))
-    stopifnot("The URL(s) must be expressed as character strings" = is.character(URLs) == TRUE)
-    stopifnot("The URL(s) are not valid" = all(unlist(
+    stopifnot('No URL(s) were provided' = !is.null(URLs))
+    stopifnot('The URL(s) must be expressed as character strings' = is.character(URLs) == TRUE)
+    stopifnot('The URL(s) are not valid' = all(unlist(
       lapply(
         URLs,
         str_detect,
-        "^\\Qhttp://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=\\E\\d{3}\\Q&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=\\E\\d{6}$"
+        '^\\Qhttp://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=\\E\\d{3}\\Q&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=\\E\\d{6}$'
       )
     )) == TRUE)
-    stopifnot("The URL(s) returned an error" = !all(unlist(lapply(
+    stopifnot('The URL(s) returned an error' = !all(unlist(lapply(
       URLs, http_error, user_agent(user_agent)
     ))) == TRUE)
     
@@ -94,12 +94,12 @@ download_temperatures <-
       # Extract download link
       download_link <- GET(URL, user_agent(user_agent)) |>
         read_html() |>
-        html_element("#content-block > ul.downloads > li:nth-child(2) > a") |>
+        html_element('#content-block > ul.downloads > li:nth-child(2) > a') |>
         html_attr('href') |>
         paste0('http://www.bom.gov.au', . = _)
       
       # Create temporary file to download zipped file in to
-      temp_file <- tempfile(fileext = ".zip")
+      temp_file <- tempfile(fileext = '.zip')
       
       # Create temporary directory to store zipped file in
       temp_dir <- tempfile()
@@ -108,7 +108,7 @@ download_temperatures <-
       download.file(
         download_link,
         temp_file,
-        mode = "wb",
+        mode = 'wb',
         headers = headers,
         quiet = TRUE
       )
@@ -127,14 +127,13 @@ download_temperatures <-
       # Extract location
       relevant_row_number <- grep('^Station name:', notes)
       relevant_row <- notes[relevant_row_number]
-      location <-
-        str_to_title(str_replace(relevant_row, 'Station name: ', ''))
+      location <- str_replace(relevant_row, 'Station name: ', '')
       
       # Extract temperature type
       relevant_row_number <- grep('^Notes for Daily', notes)
       relevant_row <- notes[relevant_row_number]
       type <-
-        str_extract(str_to_title(relevant_row), pattern = str_to_title(c("maximum|minimum")))
+        str_extract(str_to_title(relevant_row), pattern = str_to_title(c('maximum|minimum')))
       
       # Extract raw dataset
       raw_dataset <-
@@ -149,7 +148,7 @@ download_temperatures <-
           Location = location,
           Type = type
         ) |>
-        rename("Temperature" := matches('(degree)'))
+        rename('Temperature' := matches('(degree)'))
       
       # Insert rows for any missing dates
       raw_dataset <- raw_dataset |>
@@ -223,32 +222,32 @@ download_temperatures <-
 #' @export
 check_temperatures <- function(data) {
   # Check object
-  stopifnot("No data object was provided" = !is.null(data))
-  stopifnot("Data object not of the expected class" = is.data.frame(data) == TRUE)
+  stopifnot('No data object was provided' = !is.null(data))
+  stopifnot('Data object not of the expected class' = is.data.frame(data) == TRUE)
   
   # Check variables
   error_flag <- FALSE
   if (any(duplicated(colnames(data))))
     error_flag <- TRUE
-  if (!("Year" %in% colnames(data)) |
+  if (!('Year' %in% colnames(data)) |
       is.numeric(pull(data, .data$Year)) == FALSE)
     error_flag <- TRUE
-  if (!("Month" %in% colnames(data)) |
+  if (!('Month' %in% colnames(data)) |
       is.numeric(pull(data, .data$Month)) == FALSE)
     error_flag <- TRUE
-  if (!("Day" %in% colnames(data)) |
+  if (!('Day' %in% colnames(data)) |
       is.numeric(pull(data, .data$Day)) == FALSE)
     error_flag <- TRUE
-  if (!("Location" %in% colnames(data)) |
+  if (!('Location' %in% colnames(data)) |
       is.character(pull(data, .data$Location)) == FALSE)
     error_flag <- TRUE
-  if (!("Type" %in% colnames(data)) |
+  if (!('Type' %in% colnames(data)) |
       is.character(pull(data, .data$Type)) == FALSE)
     error_flag <- TRUE
-  if (!("Temperature" %in% colnames(data)) |
+  if (!('Temperature' %in% colnames(data)) |
       is.numeric(pull(data, .data$Temperature)) == FALSE)
     error_flag <- TRUE
-  stopifnot("Not all required variables exist, are unique, and/or are in the right format" = error_flag == FALSE)
+  stopifnot('Not all required variables exist, are unique, and/or are in the right format' = error_flag == FALSE)
 }
 
 #' @title
@@ -347,7 +346,7 @@ get_locations <- function(data) {
 #'
 #' # Graph daily maximum temperatures
 #' plot_temperatures(data = adelaide_data,
-#'                   season = "summer",
+#'                   season = 'summer',
 #'                   thresholds = c(30, 35, 40))
 #' }
 #'
@@ -384,14 +383,16 @@ plot_temperatures <- function(data,
   
   # Validate location argument
   if (is.null(location)) {
+    # Use 'last' rather than 'first' simply to extract 'Adelaide Airport' rather
+    # than 'Adelaide (West Terrace / Ngayirdapira)' for default argument since
+    # the former has more data to plot than the latter
     location <- last(get_locations(data))
   }
   locations <- get_locations(data)
-  stopifnot('The location is not available' = str_to_lower(location) %in% str_to_lower(locations))
+  stopifnot('The location is not available' = location %in% locations)
   
   # Argument modifications
   season <- str_to_lower(season)
-  location <- str_to_title(location)
   
   # Extract relevant months
   relevant_data <- data |>
@@ -480,7 +481,7 @@ plot_temperatures <- function(data,
   # Determine extreme temperature categories
   decimal_places <-
     max(nchar(gsub(
-      ".*\\.|^[^.]+$", "", as.character(pull(relevant_data, .data$Temperature))
+      '.*\\.|^[^.]+$', '', as.character(pull(relevant_data, .data$Temperature))
     )), na.rm = TRUE)
   decimal_part <- 1 / (10 ^ decimal_places)
   if (season == 'summer') {
@@ -528,9 +529,9 @@ plot_temperatures <- function(data,
       .data$Temperature <= threshold1
     }) |>
     # Ensure all years are present for plotting on y-axis
-    left_join(x = unique(select(relevant_data, c("Seasons_ago"))),
+    left_join(x = unique(select(relevant_data, c('Seasons_ago'))),
               y = _,
-              by = "Seasons_ago") |>
+              by = 'Seasons_ago') |>
     mutate(Temp_category = cut(.data$Temperature, temp_cutoffs))
   
   # Abort if dataset is empty
@@ -538,10 +539,10 @@ plot_temperatures <- function(data,
   
   # Determine graph properties based on season
   measure_label <- unique(pull(relevant_data, .data$Type))
-  temperature_symbol <- "\u00B0C"
+  temperature_symbol <- '\u00B0C'
   graph_edge_padding <- 4
   if (season == 'summer') {
-    colours <- c("salmon", "red2", "black")
+    colours <- c('salmon', 'red2', 'black')
     year_breaks <- seq(1, end_year - start_year)
     year_labels <-
       str_c(
@@ -556,7 +557,7 @@ plot_temperatures <- function(data,
     else
       month_breaks <- c(0, 30, 61, 92, 120, 151)
     month_labels <-
-      c("November", "December", "January", "February", "March")
+      c('November', 'December', 'January', 'February', 'March')
     direction <- 'above'
     subtitle_threshold <- threshold2_upper_chr
     range1 <-
@@ -586,14 +587,14 @@ plot_temperatures <- function(data,
     legend_limits <- legend_levels
   }
   if (season == 'winter') {
-    colours <- c("black", "cornflowerblue", "lightblue")
+    colours <- c('black', 'cornflowerblue', 'lightblue')
     year_breaks <- seq(1, end_year - start_year + 1)
     year_labels <-
       rev(as.character(unique(pull(
         relevant_data, .data$Year
       ))))
     month_breaks <- c(0, 31, 61, 92, 123, 153)
-    month_labels <- c("May", "June", "July", "August", "September")
+    month_labels <- c('May', 'June', 'July', 'August', 'September')
     direction <- 'below'
     subtitle_threshold <- threshold2_lower_chr
     range1 <-
@@ -637,7 +638,7 @@ plot_temperatures <- function(data,
     # Ensure no years with missing counts on graph
     left_join(x = unique(select(relevant_data, .data$Seasons_ago)),
               y = _,
-              by = "Seasons_ago") |>
+              by = 'Seasons_ago') |>
     replace_na(replace = list(Very_extreme_days = 0)) |>
     mutate(x_position = max(month_breaks) + graph_edge_padding)
   
@@ -655,7 +656,7 @@ plot_temperatures <- function(data,
     geom_tile(na.rm = TRUE) +
     scale_fill_manual(
       values = colours,
-      name = paste(measure_label, "temperature:"),
+      name = paste(measure_label, 'temperature:'),
       labels = legend_labels,
       limits = legend_limits
     ) +
@@ -681,27 +682,27 @@ plot_temperatures <- function(data,
       panel.grid.minor.x = element_blank(),
       axis.ticks = element_blank(),
       plot.title = element_text(hjust = 0.5),
-      plot.title.position = "plot",
+      plot.title.position = 'plot',
       plot.subtitle = element_text(hjust = 0.5),
       axis.title.x = element_blank(),
       axis.title.y = element_blank(),
-      legend.position = "bottom"
+      legend.position = 'bottom'
     ) +
     labs(
       title = paste0(
-        "Daily",
-        " ",
+        'Daily',
+        ' ',
         measure_label,
-        " ",
-        "Temperature",
-        "\n",
-        trimws(str_to_title(location))
+        ' ',
+        'Temperature',
+        '\n',
+        trimws(location)
       ),
       subtitle = paste0(
-        "Numbers on the right are counts of days with temperatures",
-        " ",
+        'Numbers on the right are counts of days with temperatures',
+        ' ',
         direction,
-        " ",
+        ' ',
         subtitle_threshold,
         temperature_symbol
       )

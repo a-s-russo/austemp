@@ -2,19 +2,19 @@
 
 library(testthat)
 
-test_that("Incorrect data", {
+test_that('Incorrect data', {
   expect_error(check_temperatures(mtcars))
 })
 
-test_that("Empty object", {
+test_that('Empty object', {
   expect_error(check_temperatures(NULL))
 })
 
-test_that("Incorrect object class", {
+test_that('Incorrect object class', {
   expect_error(check_temperatures(1:10))
 })
 
-test_that("Missing variables", {
+test_that('Missing variables', {
   expect_error(check_temperatures(data.frame(
     Year = numeric(0),
     Month = numeric(0),
@@ -22,7 +22,7 @@ test_that("Missing variables", {
   )))
 })
 
-test_that("Duplicated variables", {
+test_that('Duplicated variables', {
   data <- data.frame(
     Year = numeric(0),
     Month = numeric(0),
@@ -43,7 +43,7 @@ test_that("Duplicated variables", {
   expect_error(check_temperatures(data))
 })
 
-test_that("Incorrect variable types", {
+test_that('Incorrect variable types', {
   expect_error(check_temperatures(
     data.frame(
       Year = numeric(0),
