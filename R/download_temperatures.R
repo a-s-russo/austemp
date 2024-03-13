@@ -321,6 +321,9 @@ get_locations <- function(data) {
 #' years, plotting only one summer season (such that `start_year == end_year`)
 #' will comprise at least two rows in the resulting graph.
 #' 
+#' Dates with missing temperatures are displayed in white. (This includes the 29
+#' of February for each non-leap year since such dates obviously do not exist.)
+#' 
 #' @param data  The tibble returned from \code{\link{download_temperatures}}
 #' containing temperature data
 #' @param season One of `summer` or `winter`
@@ -333,14 +336,13 @@ get_locations <- function(data) {
 #' `get_locations(data)` is used
 #' @param thresholds Three ascending numeric thresholds that define the
 #' extreme temperatures to graph. If `NULL` provided (the default value), then
-#' the default thresholds for summer (`c(30, 35, 40)`) and winter
-#' (`c(0, 3, 5)`are provided
+#' `c(30, 35, 40)` is used for summer and `c(0, 3, 5)` is used for winter
 #' 
 #' @importFrom dplyr arrange bind_rows filter group_by if_else left_join mutate
 #' pull row_number select summarise ungroup
 #' @importFrom ggplot2 aes element_blank element_rect element_text expansion
-#' geom_text geom_tile geom_vline ggplot labs scale_fill_manual
-#' scale_x_continuous scale_y_continuous theme
+#' geom_text geom_tile geom_vline ggplot guide_legend guides labs
+#' scale_fill_manual scale_x_continuous scale_y_continuous theme
 #' @importFrom lubridate leap_year today year
 #' @importFrom rlang .data
 #' @importFrom stats na.omit
@@ -567,10 +569,6 @@ plot_temperatures <- function(data,
     } else {
       .data$Temperature <= threshold1
     }) |>
-    # Ensure all years are present for plotting on y-axis
-    left_join(x = unique(select(relevant_data, c('Seasons_ago'))),
-              y = _,
-              by = 'Seasons_ago') |>
     mutate(Temp_category = cut(.data$Temperature, temp_cutoffs))
   
   # Abort if dataset is empty
@@ -681,13 +679,10 @@ plot_temperatures <- function(data,
     replace_na(replace = list(Very_extreme_days = 0)) |>
     mutate(x_position = max(month_breaks) + graph_edge_padding)
   
-  # Note if start and/or end years have been adjusted
-  if (input_start_year < min_start_year |
-      input_start_year > max_end_year)
-    message('The starting year has been adjusted to match the data availability')
-  if (input_end_year > max_end_year |
-      input_end_year < min_start_year)
-    message('The ending year has been adjusted to match the data availability')
+  # Identify dates with missing temperatures to be displayed
+  missing_days <- filter(relevant_data, is.na(.data$Temperature))
+  extreme_days <- bind_rows(extreme_days, missing_days) |>
+    arrange(.data$Date)
   
   # Generate graph
   graph <-
@@ -704,9 +699,11 @@ plot_temperatures <- function(data,
     scale_fill_manual(
       values = colours,
       name = paste(measure_label, 'temperature:'),
-      labels = legend_labels,
-      limits = legend_limits
+      labels = c(legend_labels, 'Missing'),
+      limits = c(legend_limits, NA),
+      na.value = 'white'
     ) +
+    guides(fill = guide_legend(override.aes = list(colour = "black"))) +
     geom_vline(xintercept = month_breaks + 0.5) +
     scale_y_continuous(breaks = year_breaks,
                        labels = year_labels,
@@ -763,6 +760,14 @@ plot_temperatures <- function(data,
       ),
       inherit.aes = FALSE
     )
+  
+  # Note if start and/or end years have been adjusted
+  if (input_start_year < min_start_year |
+      input_start_year > max_end_year)
+    message('The starting year has been adjusted to match the data availability')
+  if (input_end_year > max_end_year |
+      input_end_year < min_start_year)
+    message('The ending year has been adjusted to match the data availability')
   
   # Return graph
   return(graph)

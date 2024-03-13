@@ -31,8 +31,7 @@ If \code{NULL} provided (the default value), then the last location from
 
 \item{thresholds}{Three ascending numeric thresholds that define the
 extreme temperatures to graph. If \code{NULL} provided (the default value), then
-the default thresholds for summer (\code{c(30, 35, 40)}) and winter
-(\code{c(0, 3, 5)}are provided}
+\code{c(30, 35, 40)} is used for summer and \code{c(0, 3, 5)} is used for winter}
 }
 \value{
 A temperature graph
@@ -55,6 +54,9 @@ appear in the graph for all years, otherwise it will not appear for any year.
 Since the summer months used in the graphs (Nov thru Mar) span at least two
 years, plotting only one summer season (such that \code{start_year == end_year})
 will comprise at least two rows in the resulting graph.
+
+Dates with missing temperatures are displayed in white. (This includes the 29
+of February for each non-leap year since such dates obviously do not exist.)
 }
 \examples{
 \dontrun{
