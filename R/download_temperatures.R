@@ -569,6 +569,10 @@ plot_temperatures <- function(data,
     } else {
       .data$Temperature <= threshold1
     }) |>
+    # Ensure all years are present for plotting on y-axis
+    left_join(x = unique(select(relevant_data, c('Seasons_ago'))),
+              y = _,
+              by = 'Seasons_ago') |>
     mutate(Temp_category = cut(.data$Temperature, temp_cutoffs))
   
   # Abort if dataset is empty
@@ -695,7 +699,7 @@ plot_temperatures <- function(data,
         na.rm = FALSE
       )
     ) +
-    geom_tile(na.rm = TRUE) +
+    geom_tile(na.rm = TRUE, width = 1) +
     scale_fill_manual(
       values = colours,
       name = paste(measure_label, 'temperature:'),
