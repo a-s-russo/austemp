@@ -35,6 +35,7 @@
 #' 
 #' @importFrom dplyr arrange bind_rows contains first last matches mutate n rename select slice
 #' @importFrom httr GET http_error user_agent
+#' @importFrom lubridate day month
 #' @importFrom padr pad
 #' @importFrom readr read_csv read_lines
 #' @importFrom rlang .data :=
@@ -52,9 +53,11 @@
 #' # Download Sydney data instead of default (Adelaide) data
 #' # Station: Sydney Airport AMO (number 066037)
 #' # Product: Daily maximum temperature
-#' URLpart1 <- 'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode='
+#' URLpart1 <-
+#'   'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode='
 #' product <- '122'
-#' URLpart2 <- '&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num='
+#' URLpart2 <-
+#'   '&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num='
 #' station <- '066037'
 #' download_temperatures(URLs = paste0(URLpart1, product, URLpart2, station))
 #' }
@@ -142,38 +145,45 @@ download_temperatures <-
           col_select = c(.data$Year, .data$Month, .data$Day, contains('degree')),
           show_col_types = FALSE
         ) |>
-        mutate(
-          Month = as.numeric(.data$Month),
-          Day = as.numeric(.data$Day),
-          Location = location,
-          Type = type
-        ) |>
-        rename('Temperature' := matches('(degree)'))
+        mutate(Date = as.Date(paste(
+          .data$Year,
+          .data$Month,
+          .data$Day,
+          sep = '-'
+        )))
       
       # Insert rows for any missing dates
+      min_year <- min(pull(raw_dataset, .data$Year)) - 1
+      max_year <- max(pull(raw_dataset, .data$Year)) + 1
       raw_dataset <- raw_dataset |>
         mutate(Date = as.Date(paste(
           .data$Year, .data$Month, .data$Day, sep = '-'
         ))) |>
-        pad(interval = 'day') |>
+        pad(
+          interval = 'day',
+          start_val = as.Date(paste0(min_year, '-01-01')),
+          end_val = as.Date(paste0(max_year, '-12-31'))
+        )
+      
+      # Create and select variables
+      raw_dataset <- raw_dataset |>
+        mutate(
+          Year = year(.data$Date),
+          Month = as.numeric(month(.data$Date)),
+          Day = as.numeric(day(.data$Date)),
+          Location = location,
+          Type = type
+        ) |>
+        rename('Temperature' := matches('(degree)')) |>
         select(
+          .data$Date,
           .data$Year,
           .data$Month,
           .data$Day,
           .data$Location,
           .data$Type,
-          .data$Temperature,
-          -.data$Date
+          .data$Temperature
         )
-      
-      # Remove any starting or ending rows where all measurements are missing
-      raw_dataset <- raw_dataset |>
-        slice(first(which(!is.na(
-          .data$Temperature
-        ))):n()) |>
-        slice(1:last(which(!is.na(
-          .data$Temperature
-        ))))
       
       # Merge datasets
       raw_datasets <- append(raw_datasets, list(raw_dataset))
@@ -181,7 +191,7 @@ download_temperatures <-
     
     # Combine datasets
     combined_dataset <- bind_rows(raw_datasets) |>
-      arrange(.data$Year, .data$Month, .data$Day)
+      arrange(.data$Date, .data$Location, .data$Type)
     
     # Return combined datasets
     return(combined_dataset)
@@ -205,6 +215,7 @@ download_temperatures <-
 #' @param data The object to be checked
 #' 
 #' @importFrom dplyr pull
+#' @importFrom lubridate is.Date
 #' @importFrom rlang .data
 #' 
 #' @seealso
@@ -228,6 +239,9 @@ check_temperatures <- function(data) {
   # Check variables
   error_flag <- FALSE
   if (any(duplicated(colnames(data))))
+    error_flag <- TRUE
+  if (!('Date' %in% colnames(data)) |
+      is.Date(pull(data, .data$Date)) == FALSE)
     error_flag <- TRUE
   if (!('Year' %in% colnames(data)) |
       is.numeric(pull(data, .data$Year)) == FALSE)
@@ -304,9 +318,8 @@ get_locations <- function(data) {
 #' appear in the graph for all years, otherwise it will not appear for any year.
 #' 
 #' Since the summer months used in the graphs (Nov thru Mar) span at least two
-#' years, plotting one summer season will comprise at least two rows in the
-#' resulting graph (unless the current year is chosen but it is not yet
-#' complete).
+#' years, plotting only one summer season (such that `start_year == end_year`)
+#' will comprise at least two rows in the resulting graph.
 #' 
 #' @param data  The tibble returned from \code{\link{download_temperatures}}
 #' containing temperature data
@@ -319,7 +332,9 @@ get_locations <- function(data) {
 #' If `NULL` provided (the default value), then the last location from
 #' `get_locations(data)` is used
 #' @param thresholds Three ascending numeric thresholds that define the
-#' extreme temperatures to graph
+#' extreme temperatures to graph. If `NULL` provided (the default value), then
+#' the default thresholds for summer (`c(30, 35, 40)`) and winter
+#' (`c(0, 3, 5)`are provided
 #' 
 #' @importFrom dplyr arrange bind_rows filter group_by if_else left_join mutate
 #' pull row_number select summarise ungroup
@@ -345,19 +360,17 @@ get_locations <- function(data) {
 #' adelaide_data <- download_temperatures()
 #'
 #' # Graph daily maximum temperatures
-#' plot_temperatures(data = adelaide_data,
-#'                   season = 'summer',
-#'                   thresholds = c(30, 35, 40))
+#' plot_temperatures(data = adelaide_data, season = 'summer')
 #' }
 #'
 #' @export
 # Define function to generate temperature graph
 plot_temperatures <- function(data,
                               season,
-                              start_year = year(today()) - 31,
+                              start_year = year(today()) - 30,
                               end_year = year(today()),
                               location = NULL,
-                              thresholds) {
+                              thresholds = NULL) {
   # Validate data argument
   check_temperatures(data)
   
@@ -375,7 +388,12 @@ plot_temperatures <- function(data,
   stopifnot('The starting year must not be greater than the ending year' = start_year <= end_year)
   
   # Validate thresholds argument
-  stopifnot('Three ascending numeric thresholds must be provided' = !is.null(thresholds))
+  if (is.null(thresholds)) {
+    if (season == 'summer')
+      thresholds = c(30, 35, 40)
+    if (season == 'winter')
+      thresholds = c(0, 3, 5)
+  }
   stopifnot('Three ascending numeric thresholds must be provided' = is.numeric(thresholds))
   stopifnot('Three ascending numeric thresholds must be provided' = length(thresholds) == 3)
   stopifnot('Three ascending numeric thresholds must be provided' = thresholds[1] < thresholds[2])
@@ -410,18 +428,38 @@ plot_temperatures <- function(data,
   stopifnot('There are no data to plot' = nrow(relevant_data) > 0)
   
   # Adjust start year
-  min_start_year <- relevant_data |>
-    pull(.data$Year) |>
-    min()
+  min_start_year <- min(pull(na.omit(relevant_data), .data$Year))
+  input_start_year <- start_year
   start_year <-
     max(start_year, min_start_year) - ifelse(season == 'summer', 1, 0)
   
   # Adjust end year
-  max_end_year <- relevant_data |>
-    pull(.data$Year) |>
-    max()
+  max_end_year <- max(pull(na.omit(relevant_data), .data$Year))
+  input_end_year <- end_year
   end_year <-
     min(end_year, max_end_year) + ifelse(season == 'summer', 1, 0)
+  
+  # Adjust start and end years again if necessary
+  if (season == 'summer') {
+    if (start_year >= max_end_year) {
+      start_year <- max_end_year - 1
+      end_year <- start_year + 2
+    }
+    if (end_year <= min_start_year) {
+      end_year <- min_start_year + 1
+      start_year <- end_year - 2
+    }
+  }
+  if (season == 'winter') {
+    if (start_year >= max_end_year) {
+      start_year <- max_end_year
+      start_year_adjusted <- TRUE
+    }
+    if (end_year <= min_start_year) {
+      end_year <- min_start_year
+      end_year_adjusted <- TRUE
+    }
+  }
   
   # Extract relevant years
   relevant_data <- relevant_data |>
@@ -439,7 +477,8 @@ plot_temperatures <- function(data,
         ),
         Seasons_ago = end_year - start_year - .data$Season + 1
       )
-  } else {
+  }
+  if (season == 'winter') {
     relevant_data <- relevant_data |>
       mutate(
         Season = .data$Year - start_year + 1,
@@ -641,6 +680,14 @@ plot_temperatures <- function(data,
               by = 'Seasons_ago') |>
     replace_na(replace = list(Very_extreme_days = 0)) |>
     mutate(x_position = max(month_breaks) + graph_edge_padding)
+  
+  # Note if start and/or end years have been adjusted
+  if (input_start_year < min_start_year |
+      input_start_year > max_end_year)
+    message('The starting year has been adjusted to match the data availability')
+  if (input_end_year > max_end_year |
+      input_end_year < min_start_year)
+    message('The ending year has been adjusted to match the data availability')
   
   # Generate graph
   graph <-

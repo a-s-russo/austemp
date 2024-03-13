@@ -7,10 +7,10 @@
 plot_temperatures(
   data,
   season,
-  start_year = year(today()) - 31,
+  start_year = year(today()) - 30,
   end_year = year(today()),
   location = NULL,
-  thresholds
+  thresholds = NULL
 )
 }
 \arguments{
@@ -30,7 +30,9 @@ If \code{NULL} provided (the default value), then the last location from
 \code{get_locations(data)} is used}
 
 \item{thresholds}{Three ascending numeric thresholds that define the
-extreme temperatures to graph}
+extreme temperatures to graph. If \code{NULL} provided (the default value), then
+the default thresholds for summer (\code{c(30, 35, 40)}) and winter
+(\code{c(0, 3, 5)}are provided}
 }
 \value{
 A temperature graph
@@ -51,9 +53,8 @@ If at least one leap-year is present in the data, then February 29 will
 appear in the graph for all years, otherwise it will not appear for any year.
 
 Since the summer months used in the graphs (Nov thru Mar) span at least two
-years, plotting one summer season will comprise at least two rows in the
-resulting graph (unless the current year is chosen but it is not yet
-complete).
+years, plotting only one summer season (such that \code{start_year == end_year})
+will comprise at least two rows in the resulting graph.
 }
 \examples{
 \dontrun{
@@ -61,9 +62,7 @@ complete).
 adelaide_data <- download_temperatures()
 
 # Graph daily maximum temperatures
-plot_temperatures(data = adelaide_data,
-                  season = 'summer',
-                  thresholds = c(30, 35, 40))
+plot_temperatures(data = adelaide_data, season = 'summer')
 }
 
 }

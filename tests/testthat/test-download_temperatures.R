@@ -24,6 +24,7 @@ test_that('Missing variables', {
 
 test_that('Duplicated variables', {
   data <- data.frame(
+    Date = as.Date(character(0)),
     Year = numeric(0),
     Month = numeric(0),
     Day = numeric(0),
@@ -33,7 +34,8 @@ test_that('Duplicated variables', {
     Temperature2 = character(0) # Variable to duplicate
   )
   colnames(data) <-
-    c('Year',
+    c('Date',
+      'Year',
       'Month',
       'Day',
       'Location',
@@ -46,6 +48,7 @@ test_that('Duplicated variables', {
 test_that('Incorrect variable types', {
   expect_error(check_temperatures(
     data.frame(
+      Date = as.Date(character(0)),
       Year = numeric(0),
       Month = numeric(0),
       Day = numeric(0),
