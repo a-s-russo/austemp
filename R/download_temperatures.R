@@ -95,29 +95,50 @@ download_temperatures <-
     # Extract downloaded datasets
     for (URL in URLs) {
       # Extract download link
-      download_link <- GET(URL, user_agent(user_agent)) |>
-        read_html() |>
-        html_element('#content-block > ul.downloads > li:nth-child(2) > a') |>
-        html_attr('href') |>
-        paste0('http://www.bom.gov.au', . = _)
+      tryCatch({
+        download_link <- GET(URL, user_agent(user_agent)) |>
+          read_html() |>
+          html_element('#content-block > ul.downloads > li:nth-child(2) > a') |>
+          html_attr('href') |>
+          paste0('http://www.bom.gov.au', . = _)
+      },
+      error = function(e) {
+        stop("The URL failed to be accessed")
+      })
       
-      # Create temporary file to download zipped file in to
-      temp_file <- tempfile(fileext = '.zip')
-      
-      # Create temporary directory to store zipped file in
-      temp_dir <- tempfile()
+      # Create temporary file and directory
+      tryCatch({
+        # Create temporary file to download zipped file in to
+        temp_file <- tempfile(fileext = '.zip')
+        
+        # Create temporary directory to store zipped file in
+        temp_dir <- tempfile()
+      },
+      error = function(e) {
+        stop("Temporary files failed to be created")
+      })
       
       # Download zipped file
-      download.file(
-        download_link,
-        temp_file,
-        mode = 'wb',
-        headers = headers,
-        quiet = TRUE
-      )
+      tryCatch({
+        download.file(
+          url = download_link,
+          destfile = temp_file,
+          mode = 'wb',
+          headers = headers,
+          quiet = TRUE
+        )
+      },
+      error = function(e) {
+        stop("The data failed to be downloaded")
+      })
       
       # Unzip downloaded file
-      unzip(zipfile = temp_file, exdir = temp_dir)
+      tryCatch({
+        unzip(zipfile = temp_file, exdir = temp_dir)
+      },
+      error = function(e) {
+        stop("The data file failed to be unzipped")
+      })
       
       # Extract filenames
       data_file <- list.files(temp_dir, '*.csv')
