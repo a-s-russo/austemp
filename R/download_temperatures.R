@@ -39,7 +39,7 @@
 #' @importFrom padr pad
 #' @importFrom readr read_csv read_lines
 #' @importFrom rlang .data :=
-#' @importFrom rvest html_attr html_element read_html
+#' @importFrom rvest html_attr html_element html_text read_html
 #' @importFrom stringr str_detect str_extract str_replace str_to_title
 #' @importFrom utils download.file unzip
 #' 
@@ -94,19 +94,31 @@ download_temperatures <-
     
     # Extract downloaded datasets
     for (URL in URLs) {
-      # Extract download link
+      # Scrape webpage
       tryCatch({
-        download_link <- GET(URL, user_agent(user_agent)) |>
-          read_html() |>
-          html_element('#content-block > ul.downloads > li:nth-child(2) > a') |>
-          html_attr('href') |>
-          paste0('http://www.bom.gov.au', . = _)
+        html_page <- GET(URL, user_agent(user_agent)) |>
+          read_html()
       },
       error = function(e) {
         stop("The URL failed to be accessed")
       })
       
-      # Create temporary file and directory
+      # Extract download link
+      download_link <- html_page |>
+        html_element('#content-block > ul.downloads > li:nth-child(2) > a') |>
+        html_attr('href') |>
+        paste0('http://www.bom.gov.au', . = _)
+      
+      # Extract station name
+      # (to preserve character casing since the location
+      # in both downloaded files is capitalised)
+      station_name <- html_page |>
+        html_element('#content-block > div.metadata > #site') |>
+        html_text('id') |>
+        str_replace('Station:', '') |>
+        trimws()
+      
+      # Create temporary resources
       tryCatch({
         # Create temporary file to download zipped file in to
         temp_file <- tempfile(fileext = '.zip')
@@ -115,7 +127,7 @@ download_temperatures <-
         temp_dir <- tempfile()
       },
       error = function(e) {
-        stop("Temporary files failed to be created")
+        stop("Temporary resources failed to be created")
       })
       
       # Download zipped file
@@ -147,11 +159,6 @@ download_temperatures <-
       # Extract dataset notes
       notes <-
         read_lines(paste(temp_dir, note_file, sep = '/'), skip_empty_rows = TRUE)
-      
-      # Extract location
-      relevant_row_number <- grep('^Station name:', notes)
-      relevant_row <- notes[relevant_row_number]
-      location <- str_replace(relevant_row, 'Station name: ', '')
       
       # Extract temperature type
       relevant_row_number <- grep('^Notes for Daily', notes)
@@ -192,7 +199,7 @@ download_temperatures <-
           Year = year(.data$Date),
           Month = as.numeric(month(.data$Date)),
           Day = as.numeric(day(.data$Date)),
-          Location = location,
+          Location = station_name,
           Type = type
         ) |>
         rename('Temperature' := matches('(degree)')) |>
