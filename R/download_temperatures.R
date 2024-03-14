@@ -114,7 +114,7 @@ download_temperatures <-
       # in both downloaded files is capitalised)
       station_name <- html_page |>
         html_element('#content-block > div.metadata > #site') |>
-        html_text('id') |>
+        html_text() |>
         str_replace('Station:', '') |>
         trimws()
       

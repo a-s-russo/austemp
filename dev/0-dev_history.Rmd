@@ -23,6 +23,28 @@ fusen::fill_description(
 usethis::use_gpl_license()
 ```
 
+# Include datasets
+
+```{r}
+local({
+  knitr::knit("vignettes/dev_save_data.Rmd", output = tempfile())
+  usethis::use_data(Adelaide, overwrite = TRUE)
+  usethis::use_data(Brisbane, overwrite = TRUE)
+  usethis::use_data(Canberra, overwrite = TRUE)
+  usethis::use_data(Darwin, overwrite = TRUE)
+  usethis::use_data(Hobart, overwrite = TRUE)
+  usethis::use_data(Melbourne, overwrite = TRUE)
+  usethis::use_data(Perth, overwrite = TRUE)
+  usethis::use_data(Sydney, overwrite = TRUE)
+})
+```
+
+```{r}
+fusen::inflate(flat_file = "dev/data_doc.Rmd",
+               vignette_name = NA,
+               overwrite = TRUE)
+```
+
 # Set extra sources of documentation
 
 ```{r, eval=FALSE}
@@ -35,5 +57,10 @@ usethis::use_readme_rmd()
 # Inflate flat file
 
 ```{r development-inflate, eval=FALSE}
-fusen::inflate(flat_file = "dev/flat_minimal_package.Rmd", vignette_name = NA, overwrite = TRUE)
+fusen::inflate(
+  flat_file = "dev/flat_minimal_package.Rmd",
+  vignette_name = "dev_save_data",
+  overwrite = TRUE,
+  open_vignette = FALSE
+)
 ```

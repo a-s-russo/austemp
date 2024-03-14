@@ -133,7 +133,7 @@ download_temperatures <-
       # in both downloaded files is capitalised)
       station_name <- html_page |>
         html_element('#content-block > div.metadata > #site') |>
-        html_text('id') |>
+        html_text() |>
         str_replace('Station:', '') |>
         trimws()
       
@@ -890,4 +890,55 @@ plot_temperatures <- function(data,
   # Return graph
   return(graph)
 }
+```
+
+```{r save-datasets, echo=FALSE, eval=FALSE, include=FALSE}
+Adelaide <- download_temperatures(
+  URLs = c(
+    'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023034',
+    'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=023034'
+  )
+)
+Brisbane <- download_temperatures(
+  URLs = c(
+    'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=040211',
+    'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=040211'
+  )
+)
+Canberra <- download_temperatures(
+  URLs = c(
+    'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=070351',
+    'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=070351'
+  )
+)
+Darwin <- download_temperatures(
+  URLs = c(
+    'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=014015',
+    'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=014015'
+  )
+)
+Hobart <- download_temperatures(
+  URLs = c(
+    'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=094008',
+    'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=094008'
+  )
+)
+Melbourne <- download_temperatures(
+  URLs = c(
+    'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=086282',
+    'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=086282'
+  )
+)
+Perth <- download_temperatures(
+  URLs = c(
+    'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=009021',
+    'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=009021'
+  )
+)
+Sydney <- download_temperatures(
+  URLs = c(
+    'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=066037',
+    'http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=123&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=066037'
+  )
+)
 ```
