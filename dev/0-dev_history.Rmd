@@ -48,8 +48,6 @@ fusen::inflate(flat_file = "dev/data_doc.Rmd",
 # Set extra sources of documentation
 
 ```{r, eval=FALSE}
-# Install a first time
-remotes::install_local()
 # README
 usethis::use_readme_rmd()
 ```
@@ -63,4 +61,11 @@ fusen::inflate(
   overwrite = TRUE,
   open_vignette = FALSE
 )
+```
+
+## Use everytime needed
+
+```{r, eval=FALSE}
+# Simulate package installation
+pkgload::load_all()
 ```
