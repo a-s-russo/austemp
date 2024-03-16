@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
   fig.align = "center",
   out.width = "100%"
 )
-remotes::install_local()
+devtools::install_github("a-s-russo/austemp")
 ```
 
 # Australian weather data
@@ -63,7 +63,7 @@ devtools::install_github("a-s-russo/austemp")
 
 Download summer and winter data for Adelaide:
 
-(Approximate download date & time is
+(The approximate download date & time of this example is
 `r format(Sys.time(), "%d %b %Y @ %H%p %Z")`.)
 
 ```{r example-download, message=FALSE}
@@ -103,8 +103,8 @@ plot_temperatures(
 )
 ```
 
-(There are missing temperatures in 2024 given the download date above. There are
-also no temperatures for 29 February in non-leap years obviously.)
+(There are some missing temperatures in 2024 given the download date above.
+There are also no temperatures for 29 February in non-leap years obviously.)
 
 ```{r example-plot-winter, message=FALSE, out.height="100%", out.width="100%"}
 # Graph winter temperatures
@@ -118,4 +118,5 @@ plot_temperatures(
 )
 ```
 
-(There are no temperatures for 2024 yet given the download date above.)
+(There are no temperatures at all for 2024 yet given the download date above,
+hence 2024 does not appear and so there are no missing temperatures.)

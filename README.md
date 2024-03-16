@@ -48,7 +48,8 @@ devtools::install_github("a-s-russo/austemp")
 
 Download summer and winter data for Adelaide:
 
-(Approximate download date & time is 16 Mar 2024 @ 12PM ACDT.)
+(The approximate download date & time of this example is 16 Mar 2024 @
+13PM ACDT.)
 
 ``` r
 # Load the package
@@ -89,8 +90,8 @@ plot_temperatures(
 
 <img src="man/figures/README-example-plot-summer-1.png" width="100%" height="100%" style="display: block; margin: auto;" />
 
-(There are missing temperatures in 2024 given the download date above.
-There are also no temperatures for 29 February in non-leap years
+(There are some missing temperatures in 2024 given the download date
+above. There are also no temperatures for 29 February in non-leap years
 obviously.)
 
 ``` r
@@ -107,4 +108,6 @@ plot_temperatures(
 
 <img src="man/figures/README-example-plot-winter-1.png" width="100%" height="100%" style="display: block; margin: auto;" />
 
-(There are no temperatures for 2024 yet given the download date above.)
+(There are no temperatures at all for 2024 yet given the download date
+above, hence 2024 does not appear and so there are no missing
+temperatures.)
