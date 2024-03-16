@@ -610,6 +610,7 @@ plot_temperatures <- function(data,
   measure_label <- unique(pull(relevant_data, .data$Type))
   temperature_symbol <- '\u00B0C'
   graph_edge_padding <- 4
+  na_colour = NULL
   if (season == 'summer') {
     colours <- c('salmon', 'red2', 'black')
     year_breaks <- seq(1, end_year - start_year)
@@ -716,6 +717,13 @@ plot_temperatures <- function(data,
   extreme_days <- bind_rows(extreme_days, missing_days) |>
     arrange(.data$Date)
   
+  # Adjust legend for missing temperatures
+  if (nrow(missing_days) > 0) {
+    legend_labels = c(legend_labels, 'Missing')
+    legend_limits = c(legend_limits, NA)
+    na_colour = 'white'
+  }
+  
   # Generate graph
   graph <-
     ggplot(
@@ -731,9 +739,9 @@ plot_temperatures <- function(data,
     scale_fill_manual(
       values = colours,
       name = paste(measure_label, 'temperature:'),
-      labels = c(legend_labels, 'Missing'),
-      limits = c(legend_limits, NA),
-      na.value = 'white'
+      labels = legend_labels,
+      limits = legend_limits,
+      na.value = na_colour
     ) +
     guides(fill = guide_legend(override.aes = list(colour = "black"))) +
     geom_vline(xintercept = month_breaks + 0.5) +
