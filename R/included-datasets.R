@@ -21,7 +21,7 @@
 #' }
 #' 
 #' @details
-#' Download date & time (approx.): `r format(Sys.time(), "%d %b %Y @ %H%p %Z")`
+#' Download date & time (approx.): `r format(Sys.time(), "%d %b %Y @ %l%p %Z")`
 #' 
 #' @source
 #' <http://www.bom.gov.au/climate/data/>
@@ -48,7 +48,7 @@
 #' }
 #' 
 #' @details
-#' Download date & time (approx.): `r format(Sys.time(), "%d %b %Y @ %H%p %Z")`
+#' Download date & time (approx.): `r format(Sys.time(), "%d %b %Y @ %l%p %Z")`
 #' 
 #' @source
 #' <http://www.bom.gov.au/climate/data/>
@@ -75,7 +75,7 @@
 #' }
 #' 
 #' @details
-#' Download date & time (approx.): `r format(Sys.time(), "%d %b %Y @ %H%p %Z")`
+#' Download date & time (approx.): `r format(Sys.time(), "%d %b %Y @ %l%p %Z")`
 #' 
 #' @source
 #' <http://www.bom.gov.au/climate/data/>
@@ -102,7 +102,7 @@
 #' }
 #' 
 #' @details
-#' Download date & time (approx.): `r format(Sys.time(), "%d %b %Y @ %H%p %Z")`
+#' Download date & time (approx.): `r format(Sys.time(), "%d %b %Y @ %l%p %Z")`
 #' 
 #' @source
 #' <http://www.bom.gov.au/climate/data/>
@@ -129,7 +129,7 @@
 #' }
 #' 
 #' @details
-#' Download date & time (approx.): `r format(Sys.time(), "%d %b %Y @ %H%p %Z")`
+#' Download date & time (approx.): `r format(Sys.time(), "%d %b %Y @ %l%p %Z")`
 #' 
 #' @source
 #' <http://www.bom.gov.au/climate/data/>
@@ -156,7 +156,7 @@
 #' }
 #' 
 #' @details
-#' Download date & time (approx.): `r format(Sys.time(), "%d %b %Y @ %H%p %Z")`
+#' Download date & time (approx.): `r format(Sys.time(), "%d %b %Y @ %l%p %Z")`
 #' 
 #' @source
 #' <http://www.bom.gov.au/climate/data/>
@@ -183,7 +183,7 @@
 #' }
 #' 
 #' @details
-#' Download date & time (approx.): `r format(Sys.time(), "%d %b %Y @ %H%p %Z")`
+#' Download date & time (approx.): `r format(Sys.time(), "%d %b %Y @ %l%p %Z")`
 #' 
 #' @source
 #' <http://www.bom.gov.au/climate/data/>
@@ -210,7 +210,7 @@
 #' }
 #' 
 #' @details
-#' Download date & time (approx.): `r format(Sys.time(), "%d %b %Y @ %H%p %Z")`
+#' Download date & time (approx.): `r format(Sys.time(), "%d %b %Y @ %l%p %Z")`
 #' 
 #' @source
 #' <http://www.bom.gov.au/climate/data/>

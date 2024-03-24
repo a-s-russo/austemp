@@ -30,6 +30,6 @@ A dataset containing daily temperatures for Archerfield Airport (station number:
 }
 }
 \details{
-Download date & time (approx.): 16 Mar 2024 @ 12PM ACDT
+Download date & time (approx.): 24 Mar 2024 @ 10AM ACDT
 }
 \keyword{datasets}
