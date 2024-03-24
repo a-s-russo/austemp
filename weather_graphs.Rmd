@@ -1,0 +1,59 @@
+---
+title: "Graphs of temperatures in summer and winter for Australian capital cities"
+output: html_document
+---
+
+```{r, set-up, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE,
+                      results = 'hide')
+```
+
+```{r load-data}
+tar_load(Adelaide)
+tar_load(Brisbane)
+tar_load(Canberra)
+tar_load(Darwin)
+tar_load(Hobart)
+tar_load(Melbourne)
+tar_load(Perth)
+tar_load(Sydney)
+```
+
+```{r plot-data, results='asis'}
+# Define city names and summer & winter thresholds
+cities <-
+  list(
+    list('Adelaide', c(30, 35, 40), c(0, 3, 5)),
+    list('Brisbane', c(32, 35, 40), c(0, 3, 5)),
+    list('Canberra', c(30, 35, 40), c(-5, -3, 0)),
+    list('Darwin', c(34, 35, 36), c(15, 18, 20)),
+    list('Hobart', c(25, 30, 35), c(0, 2, 4)),
+    list('Melbourne', c(30, 35, 40), c(0, 3, 5)),
+    list('Perth', c(35, 38, 42), c(0, 3, 5)),
+    list('Sydney', c(30, 35, 40), c(4, 6, 8))
+  )
+
+# Plot summer and winter graphs for each city
+res <- lapply(cities, function(city) {
+  knitr::knit_child(
+    text = c(
+      '\n',
+      paste0('## ', city[1]),
+      '\n',
+      '```{r, out.height="100%", out.width="100%"}',
+      'plot_temperatures(data = get(city[[1]][[1]]), season = "summer", thresholds = ',
+      city[2],
+      ')',
+      'plot_temperatures(data = get(city[[1]][[1]]), season = "winter", thresholds = ',
+      city[3],
+      ')',
+      '```'
+    ),
+    envir = environment(),
+    quiet = TRUE
+  )
+})
+
+cat(unlist(res), sep = "\n")
+```
