@@ -91,7 +91,7 @@
       "RemoteRepo": "austemp",
       "RemoteUsername": "a-s-russo",
       "RemoteRef": "HEAD",
-      "RemoteSha": "958b365a75ef6637311092f4717488afc8acdd7c",
+      "RemoteSha": "8313abb49b55865363ff3cc07a3604d62bfd89e0",
       "Requirements": [
         "R",
         "dplyr",
@@ -108,7 +108,7 @@
         "utils",
         "zoo"
       ],
-      "Hash": "0176c3cdaffbad030a69754e51cb4393"
+      "Hash": "29bbd89a3e9e254f623deb1ac9da19b9"
     },
     "backports": {
       "Package": "backports",
