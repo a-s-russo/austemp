@@ -30,6 +30,6 @@ A dataset containing daily temperatures for Adelaide Airport (station number:
 }
 }
 \details{
-Download date & time (approx.): 24 Mar 2024 @ 10AM ACDT
+Download date & time (approx.): 25 Mar 2024 @ 10PM ACDT
 }
 \keyword{datasets}

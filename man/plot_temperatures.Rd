@@ -51,12 +51,13 @@ the earliest and latest available years will be used, respectively.
 If at least one leap-year is present in the data, then February 29 will
 appear in the graph for all years, otherwise it will not appear for any year.
 
-Since the summer months used in the graphs (Nov thru Mar) span at least two
-years, plotting only one summer season (such that \code{start_year == end_year})
-will comprise at least two rows in the resulting graph.
+Since the summer months (Nov thru Mar) used in the graphs for a single season
+span separate years, specifying the starting and ending years will include
+part of the year before and after, respectively.
 
-Dates with missing temperatures are displayed in white. (This includes the 29
-of February for each non-leap year since such dates obviously do not exist.)
+Dates with missing temperatures (if any) are displayed in white. (This
+includes the 29 of February for each non-leap year since such dates obviously
+do not exist.)
 }
 \examples{
 \dontrun{
