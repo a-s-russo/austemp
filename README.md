@@ -8,4 +8,4 @@ A dockerised pipeline to produce graphs of maximum and minimum temperatures in s
 - Switch to the `docker` branch: `git switch docker`.
 - Build the Docker image using `docker build -t austemp_image .` (do not forget the full stop on the end).
 - Run the Docker container (and mount a volume) using `docker run --rm --name austemp_container -v /path/to/shared_folder:/home/austemp/shared_folder:rw austemp_image` (changing `/path/to/shared_folder` to a location on your computer).
-- Inspect the contents of `shared_folder` for the output (see the file `weather_graphs.html`).
+- Inspect the contents of `shared_folder` for the output (the file produced should be identical to: [weather_graphs.html](https://htmlpreview.github.io/?https://github.com/a-s-russo/austemp/blob/docker/weather_graphs.html)).
