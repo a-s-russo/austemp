@@ -48,8 +48,8 @@ devtools::install_github("a-s-russo/austemp")
 
 Download summer and winter data for Adelaide:
 
-(The approximate download date & time of this example is 24 Mar 2024 @
-10AM ACDT.)
+(The approximate download date & time of this example is 01 Apr 2024 @
+12PM ACDT.)
 
 ``` r
 # Load the package
@@ -75,8 +75,6 @@ Adelaide <-
 The downloaded data can then be graphed:
 
 ``` r
-# Load the package
-library(austemp)
 # Graph summer temperatures
 plot_temperatures(
   data = Adelaide,
@@ -84,13 +82,13 @@ plot_temperatures(
   location = 'Adelaide Airport',
   thresholds = c(30, 35, 40),
   start_year = 2001,
-  end_year = 2023
+  end_year = 2024
 )
 ```
 
 <img src="man/figures/README-example-plot-summer-1.png" width="100%" height="100%" style="display: block; margin: auto;" />
 
-(Although the requested ending year is 2023, temperatures for 2024
+(Although the requested ending year is 2024, temperatures for 2025
 appear since the summer months span consecutive years, and likewise for
 the requested starting year. There are some missing temperatures in 2024
 given the download date above. There are also no temperatures for 29
@@ -104,12 +102,13 @@ plot_temperatures(
   location = 'Adelaide Airport',
   thresholds = c(0, 3, 5),
   start_year = 2000,
-  end_year = 2023
+  end_year = 2024
 )
 ```
 
 <img src="man/figures/README-example-plot-winter-1.png" width="100%" height="100%" style="display: block; margin: auto;" />
 
-(Temperatures for 2024 do not appear since the requested ending year is
-2023. Even if requested, they would not appear since there are no
-temperatures at all for 2024 yet given the download date above.)
+(Temperatures for 2024 do not appear despite being requested since there
+are no temperatures at all for 2024 yet given the download date above.
+That is, the winter months do not span consecutive years, and so a
+winter season is contained entirely within a single year.)

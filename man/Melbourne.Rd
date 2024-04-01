@@ -30,6 +30,6 @@ number: 086282) downloaded from the Australian Bureau of Meteorology website:
 }
 }
 \details{
-Download date & time (approx.): 25 Mar 2024 @ 10PM ACDT
+Download date & time (approx.): 01 Apr 2024 @ 11AM ACDT
 }
 \keyword{datasets}
