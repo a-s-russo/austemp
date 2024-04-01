@@ -1,10 +1,11 @@
 # Australian temperatures
-A pipeline to produce graphs of maximum and minimum temperatures in summer and winter for Australian capital cities.
+A dockerised pipeline to produce graphs of maximum and minimum temperatures in summer and winter for Australian capital cities.
 
 ## How to run
 
+- Make sure [Docker](https://www.docker.com/products/docker-desktop/) is installed and working on your system.
 - Clone the repository: `git clone https://github.com/a-s-russo/austemp.git`.
-- Switch to the `pipeline` branch: `git switch pipeline`.
-- Start an R session in the folder and use `renv::restore()` (and `renv::status()` as necessary) to install the project’s dependencies (or just open the R project file `austemp.Rproj`).
-- Run the pipeline sequentially with `targets::tar_make()` or in parallel with `targets::tar_make_future(workers = 2)` (the latter should be quicker).
-- Inspect the file `weather_graphs.html` for the output.
+- Switch to the `docker` branch: `git switch docker`.
+- Build the Docker image using `docker build -t austemp_image .` (do not forget the full stop on the end).
+- Run the Docker container (and mount a volume) using `docker run --rm --name austemp_container -v /path/to/shared_folder:/home/austemp/shared_folder:rw austemp_image` (changing `/path/to/shared_folder` to a location on your computer).
+- Inspect the contents of `shared_folder` for the output (see the file `weather_graphs.html`).

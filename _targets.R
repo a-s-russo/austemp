@@ -37,5 +37,7 @@ list(
              read_data("Perth", "austemp")),
   tar_target(Sydney,
              read_data("Sydney", "austemp")),
-  tar_render(analyse, "weather_graphs.Rmd")
+  tar_render(analyse,
+             "weather_graphs.Rmd",
+             output_dir = "/home/austemp/pipeline_output")
 )
