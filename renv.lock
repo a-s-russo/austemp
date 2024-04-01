@@ -87,11 +87,11 @@
       "Version": "0.1",
       "Source": "GitHub",
       "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteRepo": "austemp",
       "RemoteUsername": "a-s-russo",
+      "RemoteRepo": "austemp",
       "RemoteRef": "HEAD",
-      "RemoteSha": "8313abb49b55865363ff3cc07a3604d62bfd89e0",
+      "RemoteSha": "2d8ac92cab3b882f0aacd482a0c0a1f013859702",
+      "RemoteHost": "api.github.com",
       "Requirements": [
         "R",
         "dplyr",
@@ -108,7 +108,7 @@
         "utils",
         "zoo"
       ],
-      "Hash": "29bbd89a3e9e254f623deb1ac9da19b9"
+      "Hash": "61c7bdcc719c3625360c7b8fb3393ccf"
     },
     "backports": {
       "Package": "backports",
